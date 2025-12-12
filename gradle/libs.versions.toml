@@ -9,6 +9,17 @@ lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.8.0"
 composeBom = "2024.09.00"
 
+# Networking
+retrofit = "3.0.0" # Networking library
+moshi = "1.15.2" # JSON parsing library
+okHttpLoggingInterceptor = "5.3.2" # Network traffic logger
+ksp = "2.3.2" # Kotlin Symbol Processing (Annotations) for Moshi Json Parsing
+
+#  Navigation
+navigation = "2.9.6" # Navigation for Compose
+kotlinxSerialization = "1.9.0" # For Navigation Route serialization
+
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -26,8 +37,22 @@ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-te
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 stil = {group = "uk.ac.starlink", name = "stil", version="4.3.4"}
 
+# Navigation
+navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
+
+# Networking
+retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit-moshiConverter = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
+retrofit-loggingInterceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okHttpLoggingInterceptor" }
+moshi-core = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
+moshi-adapters = { module = "com.squareup.moshi:moshi-adapters", version.ref = "moshi" }
+moshi-annotationProcessor = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshi" }
+
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
