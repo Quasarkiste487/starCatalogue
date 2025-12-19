@@ -11,82 +11,145 @@ import java.net.URL
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-class Simbad (private val mirror : String = FR){
+/**
+ * Client for fetching astronomical data from the SIMBAD database.
+ * Supports configurable mirror URLs for redundancy.
+ */
+class Simbad (private val mirrorUrl : String = DEFAULT_MIRROR){
     companion object{
-        const val FR = "https://simbad.cds.unistra.fr/simbad"
+        // Default SIMBAD mirror URL (France)
+        const val DEFAULT_MIRROR = "https://simbad.cds.unistra.fr/simbad"
     }
 
+    /**
+     * Fetches data from SIMBAD by executing a script query.
+     * @param queryScript The query script to execute
+     * @return A SimbadResponse containing the response stream
+     */
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    fun fetch(script: Script): RawTable {
-        val url = mirror + "/sim-script?script=" + URLEncoder.encode(script.build(), StandardCharsets.UTF_8)
-        val stream = URL(url).openConnection().getInputStream()
-        return RawTable(iStream = stream)
+    fun fetchData(queryScript: QueryScript): SimbadResponse {
+        // Build the complete URL with encoded script parameters
+        val requestUrl = mirrorUrl + "/sim-script?script=" + URLEncoder.encode(queryScript.build(), StandardCharsets.UTF_8)
+        // Establish connection and get input stream from SIMBAD server
+        val responseStream = URL(requestUrl).openConnection().getInputStream()
+        return SimbadResponse(responseStream = responseStream)
     }
 }
 
-class RawTable(val iStream : InputStream){
-    private var header = HashMap<String, String>()
+/**
+ * Represents the raw response from a SIMBAD query.
+ * Parses header information from the response and provides access to the underlying table data.
+ */
+class SimbadResponse(val responseStream : InputStream){
+    // Stores metadata sections from the response (e.g., warnings, info)
+    private var headerMetadata = HashMap<String, String>()
 
     init {
-        var currentSegment : String? = null
-        val buffer = StringBuilder()
+        // Current section name being parsed from response header
+        var currentSectionName : String? = null
+        // Buffer to accumulate lines for the current section
+        val sectionContentBuffer = StringBuilder()
 
-        for (line in iStream.readLinesStrictUntil("<\\?xml.*\\?>".toRegex())){
+        // Parse response lines until the XML declaration is found
+        for (line in responseStream.readLinesUntilXmlStart("<\\?xml.*\\?>".toRegex())){
             if (line.startsWith("::")){
-                if (currentSegment != null){
-                    println("Read $currentSegment with ${buffer.length} chars")
-                    header[currentSegment] = buffer.toString()
+                // New section detected; save the previous section if it exists
+                if (currentSectionName != null){
+                    println("Read $currentSectionName with ${sectionContentBuffer.length} chars")
+                    headerMetadata[currentSectionName] = sectionContentBuffer.toString()
                 }
-                currentSegment = line.substringAfter("::").substringBefore(":")
-                buffer.clear()
+                // Extract section name (between "::" and ":")
+                currentSectionName = line.substringAfter("::").substringBefore(":")
+                sectionContentBuffer.clear()
             } else {
-                buffer.appendLine(line)
+                // Accumulate content for the current section
+                sectionContentBuffer.appendLine(line)
             }
         }
     }
 
-    fun header() : Map<String, String> = header
+    /**
+     * Returns the parsed header metadata from the response.
+     */
+    fun getHeaderMetadata() : Map<String, String> = headerMetadata
 
-    fun build(): StarTable {
-        val error = header["error"]
-        if (error != null){
-            throw Error(error)
+    /**
+     * Builds a StarTable from the VOTable XML data in the response.
+     * @throws Error if an error message is present in the response headers
+     * @return A StarTable object containing the parsed astronomical data
+     */
+    fun buildStarTable(): StarTable {
+        // Check for errors reported by SIMBAD
+        val errorMessage = headerMetadata["error"]
+        if (errorMessage != null){
+            throw Error(errorMessage)
         }
-        return StarTableFactory().makeStarTable(iStream, VOTableBuilder())
+        // Parse the VOTable XML format into a StarTable
+        return StarTableFactory().makeStarTable(responseStream, VOTableBuilder())
     }
 }
 
-internal fun InputStream.readLinesStrictUntil(delim: Regex): List<String> {
-    val lines = mutableListOf<String>()
+/**
+ * Reads lines from an InputStream until a line matches the given regex delimiter (XML start).
+ * Handles line endings (CR/LF) correctly across different platforms.
+ * @param xmlDelimiterPattern The regex pattern to match for stopping (typically XML declaration)
+ * @return A list of lines read up to and including the delimiter
+ */
+internal fun InputStream.readLinesUntilXmlStart(xmlDelimiterPattern: Regex): List<String> {
+    val linesList = mutableListOf<String>()
     do {
-        val sb = StringBuilder()
-        var byte: Int
+        val currentLineBuilder = StringBuilder()
+        var currentByte: Int
+        // Read bytes until end of line or end of stream
         while (true) {
-            byte = this.read()
-            if (byte == -1 || byte == '\n'.code) break
-            if (byte != '\r'.code) sb.append(byte.toChar())
+            currentByte = this.read()
+            // Stop on newline or EOF
+            if (currentByte == -1 || currentByte == '\n'.code) break
+            // Skip carriage returns for cross-platform compatibility
+            if (currentByte != '\r'.code) currentLineBuilder.append(currentByte.toChar())
         }
-        if (byte == -1 && sb.isEmpty()) break
-        lines.add(sb.toString())
-    } while (!delim.matches(sb.toString()))
-    return lines
+        // Break if we reached EOF with an empty line
+        if (currentByte == -1 && currentLineBuilder.isEmpty()) break
+        linesList.add(currentLineBuilder.toString())
+    } while (!xmlDelimiterPattern.matches(currentLineBuilder.toString()))
+    return linesList
 }
 
+/**
+ * Prints all rows and columns of a StarTable in a tab-separated format.
+ * @throws IOException if an error occurs while reading the table
+ */
 @Throws(IOException::class)
 fun StarTable.printAll() {
-    val nCol = this.columnCount
-    val rseq = this.rowSequence
-    while (rseq.next()) {
-        val row = rseq.row
-        for (icol in 0..<nCol) {
-            print(row[icol].toString() + "\t")
+    val columnCount = this.columnCount
+    val rowSequence = this.rowSequence
+    // Iterate through all rows
+    while (rowSequence.next()) {
+        val currentRow = rowSequence.row
+        // Print each column value separated by tabs
+        for (columnIndex in 0..<columnCount) {
+            print(currentRow[columnIndex].toString() + "\t")
         }
+        // Move to next row
         println()
     }
-    rseq.close()
+    // Close the sequence to free resources
+    rowSequence.close()
 }
 
-class Script(val limit : Int, val fields: List<String>, val criteria: String){
+/**
+ * Represents a SIMBAD query script with configurable parameters.
+ * Builds a script string compatible with SIMBAD's scripting language.
+ *
+ * @param limit Maximum number of results to return
+ * @param fields List of data fields to include in the VOTable response
+ * @param criteria Query criteria for filtering astronomical objects
+ */
+class QueryScript(val limit : Int, val fields: List<String>, val criteria: String){
+    /**
+     * Builds the complete SIMBAD query script with proper formatting.
+     * @return A formatted script string for submission to SIMBAD
+     */
     fun build() : String =
         """
         set limit $limit

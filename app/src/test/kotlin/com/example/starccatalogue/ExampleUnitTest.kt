@@ -1,6 +1,6 @@
 package com.example.starccatalogue
 
-import com.example.starccatalogue.network.Script
+import com.example.starccatalogue.network.QueryScript
 import com.example.starccatalogue.network.Simbad
 import com.example.starccatalogue.network.printAll
 import org.junit.Test
@@ -16,11 +16,11 @@ class ExampleUnitTest {
 
     @Test
     fun fetchStardata() {
-        val script = Script(10, listOf("main_id", "coordinates", "flux(V)"), "Vmag < 6")
-        val raw = Simbad().fetch(script)
-        println(raw.header())
+        val queryScript = QueryScript(10, listOf("main_id", "coordinates", "flux(V)"), "Vmag < 6")
+        val simbadResponse = Simbad().fetchData(queryScript)
+        println(simbadResponse.getHeaderMetadata())
 
-        val table = raw.build()
-        table.printAll()
+        val starTable = simbadResponse.buildStarTable()
+        starTable.printAll()
     }
 }
