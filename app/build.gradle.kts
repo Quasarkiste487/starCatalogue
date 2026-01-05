@@ -73,4 +73,6 @@ dependencies {
     implementation(libs.moshi.core)
     implementation(libs.moshi.adapters)
     ksp(libs.moshi.annotationProcessor)
+
+    implementation(libs.androidx.compose.material.icons.extended)
 }

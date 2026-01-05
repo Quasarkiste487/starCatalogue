@@ -8,6 +8,7 @@ espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.12.1"
 composeBom = "2025.12.00"
+compose-icons = "1.7.6"
 
 # Networking
 retrofit = "3.0.0" # Networking library
@@ -49,6 +50,8 @@ moshi-core = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-adapters = { module = "com.squareup.moshi:moshi-adapters", version.ref = "moshi" }
 moshi-annotationProcessor = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshi" }
 
+# Icons
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "compose-icons" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
