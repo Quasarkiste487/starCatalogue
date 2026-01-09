@@ -2,8 +2,11 @@ package com.example.starccatalogue
 
 import com.example.starccatalogue.network.QueryScript
 import com.example.starccatalogue.network.Simbad
+import com.example.starccatalogue.network.SimbadResponse
 import com.example.starccatalogue.network.printAll
 import org.junit.Test
+import uk.ac.starlink.table.StarTable
+import kotlin.time.measureTime
 
 
 /**
@@ -15,12 +18,41 @@ class ExampleUnitTest {
     var base = "https://simbad.cds.unistra.fr/simbad/sim-script"
 
     @Test
-    fun fetchStardata() {
-        val queryScript = QueryScript(10, listOf("main_id", "coordinates", "flux(V)"), "Vmag < 6")
-        val simbadResponse = Simbad().fetchData(queryScript)
-        println(simbadResponse.getHeaderMetadata())
+    fun fetchStardataScript() {
+        val script = QueryScript(10, listOf("main_id", "ra", "dec", "flux(V)"), "Vmag < 6")
+        var raw : SimbadResponse
+        println("fetched data in: " + measureTime {
+            raw = Simbad().fetchData(script)
+        })
+        println(raw.getHeaderMetadata())
+        var table : StarTable
+        println("built table in: " + measureTime {
+            table = raw.buildStarTable()
+        })
 
-        val starTable = simbadResponse.buildStarTable()
-        starTable.printAll()
+        table.printAll()
+    }
+
+    @Test
+    fun fetchStardataSQL(){
+        val query = """
+            SELECT TOP 100 id, V as mag, ra, dec  from ident
+JOIN allfluxes USING(oidref)
+JOIN basic on oid = oidref
+WHERE id LIKE '%NAME%'
+ORDER BY V
+        """.trimIndent()
+
+        var raw : SimbadResponse
+        println("fetched data in: " + measureTime {
+            raw = Simbad().fetchData(query)
+        })
+        println(raw.getHeaderMetadata())
+        var table : StarTable
+        println("built table in: " + measureTime {
+            table = raw.buildStarTable()
+        })
+
+        table.printAll()
     }
 }

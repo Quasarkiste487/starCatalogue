@@ -1,34 +1,41 @@
 package com.example.starccatalogue.ui.stars
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.starccatalogue.network.ApiStar
-import com.example.starccatalogue.network.starsApi
+import com.example.starccatalogue.network.QueryScript
+import com.example.starccatalogue.network.Simbad
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import uk.ac.starlink.table.EmptyStarTable
+import uk.ac.starlink.table.StarTable
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 class StarsViewModel: ViewModel(){
-    private val _stars: MutableStateFlow<List<ApiStar>> = MutableStateFlow(emptyList())
-    val stars: StateFlow<List<ApiStar>> = _stars.asStateFlow()
+    private val _stars: MutableStateFlow<StarTable> = MutableStateFlow(EmptyStarTable())
+    val stars: StateFlow<StarTable> = _stars.asStateFlow()
 
     init {
         loadData()
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun loadData() {
-        viewModelScope.launch {
-            val starsResponse = starsApi.getStars()
-            val responseBody = starsResponse.body()
-
+        viewModelScope.launch(Dispatchers.IO) {
             _stars.update {
-                if(starsResponse.isSuccessful && responseBody != null) {
-                    responseBody
+                val script = QueryScript(10, listOf("main_id", "coordinates", "flux(V)"), "Vmag < 6")
+                val starsResponse = Simbad().fetchData(script)
+
+                if(starsResponse.error() == null) {
+                    starsResponse.buildStarTable()
                 } else {
-                    emptyList()
+                    EmptyStarTable()
                 }
             }
         }
