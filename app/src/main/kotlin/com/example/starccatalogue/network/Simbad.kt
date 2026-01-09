@@ -1,7 +1,10 @@
 package com.example.starccatalogue.network
 
+import android.net.http.NetworkException
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresExtension
+import okhttp3.internal.connection.Exchange
 import uk.ac.starlink.table.StarTable
 import uk.ac.starlink.table.StarTableFactory
 import uk.ac.starlink.votable.VOTableBuilder
@@ -26,13 +29,31 @@ class Simbad (private val mirrorUrl : String = DEFAULT_MIRROR){
      * @param queryScript The query script to execute
      * @return A SimbadResponse containing the response stream
      */
+    fun fetchData(url: URL) : SimbadResponse?{
+        try{
+            val responseStream = url.openConnection().getInputStream()
+            return SimbadResponse(responseStream = responseStream)
+        }catch(e : Exception) {
+            print("Exception occured while fetching data: $e")
+        }
+        return null
+    }
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    fun fetchData(queryScript: QueryScript): SimbadResponse {
+    fun fetchData(queryScript: QueryScript): SimbadResponse? {
         // Build the complete URL with encoded script parameters
-        val requestUrl = mirrorUrl + "/sim-script?script=" + URLEncoder.encode(queryScript.build(), StandardCharsets.UTF_8)
+        val requestUrl = "$mirrorUrl/sim-script?script=" + URLEncoder.encode(queryScript.build(), StandardCharsets.UTF_8)
         // Establish connection and get input stream from SIMBAD server
-        val responseStream = URL(requestUrl).openConnection().getInputStream()
-        return SimbadResponse(responseStream = responseStream)
+
+        return fetchData(URL(requestUrl))
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    fun fetchData(sqlQuery: String): SimbadResponse? {
+        val requestUrl = "$mirrorUrl/sim-tap/sync?request=doQuery&lang=adql&format=votable&query=" + URLEncoder.encode(sqlQuery,
+            StandardCharsets.UTF_8)
+        println("URL: $requestUrl")
+
+        return fetchData(URL(requestUrl))
     }
 }
 
@@ -80,13 +101,15 @@ class SimbadResponse(val responseStream : InputStream){
      */
     fun buildStarTable(): StarTable {
         // Check for errors reported by SIMBAD
-        val errorMessage = headerMetadata["error"]
+        val errorMessage = error()
         if (errorMessage != null){
             throw Error(errorMessage)
         }
         // Parse the VOTable XML format into a StarTable
         return StarTableFactory().makeStarTable(responseStream, VOTableBuilder())
     }
+
+    fun error(): String? = headerMetadata["error"]
 }
 
 /**
@@ -121,6 +144,11 @@ internal fun InputStream.readLinesUntilXmlStart(xmlDelimiterPattern: Regex): Lis
  */
 @Throws(IOException::class)
 fun StarTable.printAll() {
+    for (i in 0..<columnCount){
+        print(getColumnInfo(i).name + "\t")
+    }
+    println()
+
     val columnCount = this.columnCount
     val rowSequence = this.rowSequence
     // Iterate through all rows
@@ -130,6 +158,7 @@ fun StarTable.printAll() {
         for (columnIndex in 0..<columnCount) {
             print(currentRow[columnIndex].toString() + "\t")
         }
+        currentRow[0]
         // Move to next row
         println()
     }

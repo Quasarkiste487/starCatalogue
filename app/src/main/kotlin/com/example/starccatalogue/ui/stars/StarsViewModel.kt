@@ -29,10 +29,18 @@ class StarsViewModel: ViewModel(){
     private fun loadData() {
         viewModelScope.launch(Dispatchers.IO) {
             _stars.update {
-                val script = QueryScript(10, listOf("main_id", "coordinates", "flux(V)"), "Vmag < 6")
-                val starsResponse = Simbad().fetchData(script)
+                //val script = QueryScript(10, listOf("main_id", "coordinates", "flux(V)"), "Vmag < 6")
+                val query = """
+                SELECT TOP 100 id, V as mag, ra, dec  from ident
+                JOIN allfluxes USING(oidref)
+                JOIN basic on oid = oidref
+                WHERE id LIKE '%NAME%'
+                ORDER BY V
+                """.trimIndent()
 
-                if(starsResponse.error() == null) {
+                val starsResponse = Simbad().fetchData(query)
+
+                if(starsResponse != null && starsResponse.error() == null) {
                     starsResponse.buildStarTable()
                 } else {
                     EmptyStarTable()

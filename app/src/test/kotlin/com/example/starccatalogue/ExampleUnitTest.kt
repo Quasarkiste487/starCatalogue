@@ -20,10 +20,15 @@ class ExampleUnitTest {
     @Test
     fun fetchStardataScript() {
         val script = QueryScript(10, listOf("main_id", "ra", "dec", "flux(V)"), "Vmag < 6")
-        var raw : SimbadResponse
+        var raw : SimbadResponse?
         println("fetched data in: " + measureTime {
             raw = Simbad().fetchData(script)
         })
+
+        if (raw == null){
+            return
+        }
+
         println(raw.getHeaderMetadata())
         var table : StarTable
         println("built table in: " + measureTime {
@@ -36,17 +41,20 @@ class ExampleUnitTest {
     @Test
     fun fetchStardataSQL(){
         val query = """
-            SELECT TOP 100 id, V as mag, ra, dec  from ident
-JOIN allfluxes USING(oidref)
-JOIN basic on oid = oidref
-WHERE id LIKE '%NAME%'
-ORDER BY V
+        SELECT TOP 100 id, V as mag, ra, dec  from ident
+        JOIN allfluxes USING(oidref)
+        JOIN basic on oid = oidref
+        WHERE id LIKE '%NAME%'
+        ORDER BY V
         """.trimIndent()
 
-        var raw : SimbadResponse
+        var raw : SimbadResponse?
         println("fetched data in: " + measureTime {
             raw = Simbad().fetchData(query)
         })
+        if (raw == null){
+            return
+        }
         println(raw.getHeaderMetadata())
         var table : StarTable
         println("built table in: " + measureTime {
