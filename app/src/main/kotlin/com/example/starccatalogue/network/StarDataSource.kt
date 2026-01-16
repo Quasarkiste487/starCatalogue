@@ -35,7 +35,7 @@ interface StarDataSource {
      *   empty result is produced by the data source, this method returns an
      *   empty list.
      */
-    fun listStars(limit : Int) : List<StarOverview>
+    fun listStars(limit : Int, name : String) : List<StarOverview>
 
     /**
      * Returns detailed information about a single star identified by [oid].
@@ -50,12 +50,13 @@ interface StarDataSource {
 
 class SimbadSQLSource(val simbad: Simbad) : StarDataSource{
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    override fun listStars(limit: Int) : List<StarOverview>{
+    override fun listStars(limit: Int, name : String) : List<StarOverview>{
         val query = """
         SELECT TOP $limit oid, id, description from basic
         JOIN ident on oid = oidref and id LIKE '%NAME %'
         JOIN allfluxes using(oidref)
         JOIN otypedef using(otype)
+        WHERE id LIKE '%$name%'
         order by V
         """.trimIndent()
 
