@@ -23,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.MyLocation
@@ -49,18 +48,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.viewmodel.koinViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun StarsScreen(
+    starId: String,
     onNavigateBack: () -> Unit,
-    viewModel: StarsViewModel = koinViewModel(),
+    viewModel: StarsViewModel = viewModel(factory = StarsViewModel.provideFactory(starId)),
 ) {
     val starState by viewModel.starState.collectAsStateWithLifecycle()
     StarsScreen(
         starState = starState,
         onNavigateBack = onNavigateBack,
-        onToggleBookmark = viewModel::toggleBookmark,
     )
 }
 
@@ -69,13 +69,12 @@ fun StarsScreen(
 private fun StarsScreen(
     starState: StarUiState,
     onNavigateBack: () -> Unit,
-    onToggleBookmark: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text(starState.name) },
+                title = { Text(starState.id.ifEmpty { "Stern xy" }) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -85,10 +84,10 @@ private fun StarsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onToggleBookmark) {
+                    IconButton(onClick = { /* TODO: Bookmark-Funktion */ }) {
                         Icon(
-                            imageVector = if (starState.isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                            contentDescription = if (starState.isBookmarked) "Bookmark entfernen" else "Bookmark hinzufügen"
+                            imageVector = Icons.Outlined.BookmarkBorder,
+                            contentDescription = "Merken"
                         )
                     }
                 },
@@ -157,19 +156,21 @@ private fun HeroSection(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = starState.name,
+                    text = starState.id.ifEmpty { "Stern" },
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     textAlign = TextAlign.Center
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Magnitude ${starState.magnitude}",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Color(0xFFE1BEE7), // Light purple
-                    textAlign = TextAlign.Center
-                )
+                if (starState.magnitude.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Magnitude ${starState.magnitude}",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color(0xFFE1BEE7), // Light purple
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }
@@ -194,36 +195,45 @@ private fun DataCardsSection(
         )
 
         // ID Card
-        DataCard(
-            label = "Identifier",
-            value = starState.name,
-            icon = Icons.Outlined.LightMode
-        )
+        if (starState.id.isNotEmpty()) {
+            DataCard(
+                label = "Identifier",
+                value = starState.id,
+                icon = Icons.Outlined.LightMode
+            )
+        }
 
         // Magnitude & RA Row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            if (starState.magnitude.isNotEmpty()) {
                 DataCard(
-                    label = "Declination",
-                    value = starState.dec.toString(),
+                    label = "Magnitude",
+                    value = starState.magnitude,
                     icon = Icons.Filled.Star,
                     modifier = Modifier.weight(1f)
                 )
+            }
+            if (starState.ra.isNotEmpty()) {
                 DataCard(
-                    label = "Right Ascension",
-                    value = starState.ra.toString(),
+                    label = "RA",
+                    value = starState.ra,
                     icon = Icons.Outlined.MyLocation,
                     modifier = Modifier.weight(1f)
                 )
+            }
         }
 
-        DataCard(
-            label = "Magnitude",
-            value = starState.magnitude.toString(),
-            icon = Icons.Outlined.Explore
-        )
+        // Dec Card
+        if (starState.dec.isNotEmpty()) {
+            DataCard(
+                label = "Declination",
+                value = starState.dec,
+                icon = Icons.Outlined.Explore
+            )
+        }
     }
 }
 
@@ -283,15 +293,28 @@ private fun DataCard(
 private fun StarsScreenPreview() {
     StarsScreen(
         starState = StarUiState(
-            id = 0,
-            name = "Sirius",
-            magnitude = -1.46f,
-            ra = 101.287155f,
-            dec = -16.716116f,
-            isLoading = false,
-            isBookmarked = false
+            id = "Sirius",
+            magnitude = "-1.46",
+            ra = "101.287155",
+            dec = "-16.716116",
+            isLoading = false
         ),
-        onNavigateBack = {},
-        onToggleBookmark = {}
+        onNavigateBack = {}
     )
 }
+
+@Preview(showBackground = true, showSystemUi = true, name = "Loading State")
+@Composable
+private fun StarsScreenLoadingPreview() {
+    StarsScreen(
+        starState = StarUiState(
+            id = "",
+            magnitude = "",
+            ra = "",
+            dec = "",
+            isLoading = true
+        ),
+        onNavigateBack = {}
+    )
+}
+

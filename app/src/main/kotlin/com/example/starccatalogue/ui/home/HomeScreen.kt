@@ -49,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun HomeScreen(
+<<<<<<< HEAD
     viewModel: HomeViewModel = viewModel(),
     onProfileClick: () -> Unit = {},
     onEventClick: (EventRow) -> Unit = {},
@@ -63,6 +64,17 @@ fun HomeScreen(
         onEventClick = onEventClick,
         onOpenDrawer = onOpenDrawer,
         onSearch = onSearch,
+=======
+    onProfileClick: (String) -> Unit,
+    onSearchClick: (String) -> Unit
+) {
+    /* TODO: Daten für Screen aus ViewModel holen*/
+    val todaysStarId = "Betelgeuse"
+    HomeScreen(
+        onProfileClick = { onProfileClick(todaysStarId) },
+        onEventClick = { /* TODO */ },
+        onSearchClick = onSearchClick
+>>>>>>> a4daf30 (feat-#6: basic vibe engineered stuff)
     )
 }
 
@@ -72,8 +84,12 @@ private fun HomeScreen(
     uiState: HomeUiState,
     onProfileClick: () -> Unit,
     onEventClick: (EventRow) -> Unit,
+<<<<<<< HEAD
     onOpenDrawer: () -> Unit,
     onSearch: (String) -> Unit,
+=======
+    onSearchClick: (String) -> Unit
+>>>>>>> a4daf30 (feat-#6: basic vibe engineered stuff)
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -83,7 +99,11 @@ private fun HomeScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+<<<<<<< HEAD
             SearchBar(onMenuClick = onOpenDrawer, onSearch = onSearch)
+=======
+            SearchBar(onSearch = onSearchClick)
+>>>>>>> a4daf30 (feat-#6: basic vibe engineered stuff)
             Spacer(Modifier.height(16.dp))
             TopStarCard(
                 topStar = uiState.topStar, onProfileClick = onProfileClick
@@ -104,7 +124,10 @@ private fun HomeScreen(
 private fun SearchBar(
     modifier: Modifier = Modifier,
     placeholder: String = "Sterne",
+<<<<<<< HEAD
     onMenuClick: () -> Unit = {},
+=======
+>>>>>>> a4daf30 (feat-#6: basic vibe engineered stuff)
     onSearch: (String) -> Unit
 ) {
     var value by remember { mutableStateOf("") }
