@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 
 data class StarItem(
     val name: String,
+    val type: String,
 )
 class ListVM(
     savedStateHandle: SavedStateHandle
@@ -19,6 +20,8 @@ class ListVM(
     private val starName: String = savedStateHandle
         .toRoute<ListR>()
         .starName
+    val searchQuery: String
+        get() = starName
     private val _stars: MutableStateFlow<List<StarItem>> = MutableStateFlow(emptyList())
     val stars: StateFlow<List<StarItem>> = _stars.asStateFlow()
 
@@ -28,12 +31,13 @@ class ListVM(
 
     private fun loadData() {
         viewModelScope.launch {
+            // TODO: Replace with real data loading logic and query with starName
             val starsResponse = listOf(
-                StarItem(name = "Sirius"),
-                StarItem(name = "Canopus"),
-                StarItem(name = "Arcturus"),
-                StarItem(name = "Vega"),
-                StarItem(name = "Capella"),
+                StarItem(name = "Sirius", type = "typ 1"),
+                StarItem(name = "Canopus", type = "typ 2"),
+                StarItem(name = "Arcturus", type = "typ 2"),
+                StarItem(name = "Vega", type = "typ 2"),
+                StarItem(name = "Capella", type = "typ 4"),
             )
             _stars.update {
                 if (starsResponse != null) {

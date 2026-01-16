@@ -54,6 +54,7 @@ fun HomeScreen(
     onProfileClick: () -> Unit = {},
     onEventClick: (EventRow) -> Unit = {},
     onOpenDrawer: () -> Unit = {},
+    onSearch: (String) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -62,6 +63,7 @@ fun HomeScreen(
         onProfileClick = onProfileClick,
         onEventClick = onEventClick,
         onOpenDrawer = onOpenDrawer,
+        onSearch = onSearch,
     )
 }
 
@@ -72,6 +74,7 @@ private fun HomeScreen(
     onProfileClick: () -> Unit,
     onEventClick: (EventRow) -> Unit,
     onOpenDrawer: () -> Unit,
+    onSearch: (String) -> Unit,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -81,7 +84,7 @@ private fun HomeScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            SearchBar(onMenuClick = onOpenDrawer)
+            SearchBar(onMenuClick = onOpenDrawer, onSearch = onSearch)
             Spacer(Modifier.height(16.dp))
             TopStarCard(
                 topStar = uiState.topStar, onProfileClick = onProfileClick
@@ -103,6 +106,7 @@ private fun SearchBar(
     modifier: Modifier = Modifier,
     placeholder: String = "Sterne",
     onMenuClick: () -> Unit = {},
+    onSearch: (String) -> Unit
 ) {
     var value by remember { mutableStateOf("") }
     Surface(
@@ -138,7 +142,7 @@ private fun SearchBar(
                 }
                 innerTextField()
             }
-            IconButton(onClick = { /* TODO: handle search */ }) {
+            IconButton(onClick = { onSearch(value) }) {
                 Icon(imageVector = Icons.Filled.Search, contentDescription = "Suche")
             }
         }
@@ -336,6 +340,7 @@ private fun HomeScreenPreview() {
             onProfileClick = {},
             onEventClick = {},
             onOpenDrawer = {},
+            onSearch = {},
         )
     }
 }
@@ -346,7 +351,7 @@ private fun SearchBarPreview() {
     MaterialTheme {
         Box(modifier = Modifier.background(Color.White)) {
             SearchBar(
-                modifier = Modifier.padding(16.dp), onMenuClick = {})
+                modifier = Modifier.padding(16.dp), onMenuClick = {}, onSearch = {})
         }
     }
 }
