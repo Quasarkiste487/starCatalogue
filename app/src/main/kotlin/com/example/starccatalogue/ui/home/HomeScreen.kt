@@ -1,5 +1,7 @@
 package com.example.starccatalogue.ui.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,6 +26,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,55 +45,95 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
     onProfileClick: () -> Unit = {},
-    onEventClick: (EventRow) -> Unit = {}
+    onEventClick: (EventRow) -> Unit = {},
+    onHomeClick: () -> Unit = {},
+    onStarListClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
         uiState = uiState,
         onProfileClick = onProfileClick,
-        onEventClick = onEventClick
+        onEventClick = onEventClick,
+        onHomeClick = onHomeClick,
+        onStarListClick = onStarListClick
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
     uiState: HomeUiState,
     onProfileClick: () -> Unit,
     onEventClick: (EventRow) -> Unit,
+    onHomeClick: () -> Unit,
+    onStarListClick: () -> Unit,
 ) {
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            SearchBar()
-            Spacer(Modifier.height(16.dp))
-            TopStarCard(
-                topStar = uiState.topStar,
-                onProfileClick = onProfileClick
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            AppDrawer(
+                appName = "Star Catalogue",
+                onHomeClick = {
+                    onHomeClick()
+                    scope.launch { drawerState.close() }
+                },
+                onStarListClick = {
+                    onStarListClick()
+                    scope.launch { drawerState.close() }
+                }
             )
-            Spacer(Modifier.height(16.dp))
-            uiState.blogArticle?.let { article ->
-                BlogSection(article)
+        }
+    ) {
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                SearchBar(
+                    onMenuClick = {
+                        scope.launch {
+                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                        }
+                    }
+                )
+                Spacer(Modifier.height(16.dp))
+                TopStarCard(
+                    topStar = uiState.topStar,
+                    onProfileClick = onProfileClick
+                )
+                Spacer(Modifier.height(16.dp))
+                uiState.blogArticle?.let { article ->
+                    BlogSection(article)
+                }
+                Spacer(Modifier.height(16.dp))
+                EventsList(
+                    events = uiState.events,
+                    onEventClick = onEventClick
+                )
             }
-            Spacer(Modifier.height(16.dp))
-            EventsList(
-                events = uiState.events,
-                onEventClick = onEventClick
-            )
         }
     }
 }
@@ -97,7 +141,8 @@ private fun HomeScreen(
 @Composable
 private fun SearchBar(
     modifier: Modifier = Modifier,
-    placeholder: String = "Sterne"
+    placeholder: String = "Sterne",
+    onMenuClick: () -> Unit = {},
 ) {
     var value by remember { mutableStateOf("") }
     Surface(
@@ -113,7 +158,7 @@ private fun SearchBar(
                 .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { /* TODO: handle menu */ }) {
+            IconButton(onClick = onMenuClick) {
                 Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menü")
             }
             BasicTextField(
@@ -136,6 +181,81 @@ private fun SearchBar(
             IconButton(onClick = { /* TODO: handle search */ }) {
                 Icon(imageVector = Icons.Filled.Search, contentDescription = "Suche")
             }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+private fun AppDrawer(
+    appName: String,
+    onHomeClick: () -> Unit,
+    onStarListClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .fillMaxWidth(0.8f) // Drawer-Breite
+            .background(Color.White)
+    ) {
+        // Banner oben mit App-Namen
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFF7970FF))
+                .padding(24.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Text(
+                text = appName,
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Menüeinträge
+        NavigationDrawerItem(
+            label = { Text("Home") },
+            selected = false,
+            onClick = onHomeClick,
+            modifier = Modifier.padding(horizontal = 12.dp),
+            colors = NavigationDrawerItemDefaults.colors(
+                selectedContainerColor = Color(0xFFE6EAF1)
+            )
+        )
+
+        NavigationDrawerItem(
+            label = { Text("Sternenliste") },
+            selected = false,
+            onClick = onStarListClick,
+            modifier = Modifier.padding(horizontal = 12.dp),
+            colors = NavigationDrawerItemDefaults.colors(
+                selectedContainerColor = Color(0xFFE6EAF1)
+            )
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // App-Infos unten
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = "Version 1.0.0", // feste Version oder später per Parameter
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
+            Text(
+                text = "© 2026 Star Catalogue",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
         }
     }
 }
@@ -286,6 +406,7 @@ private fun EventCard(event: EventRow, onClick: () -> Unit) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true, heightDp = 800)
 @Composable
 private fun HomeScreenPreview() {
@@ -312,7 +433,9 @@ private fun HomeScreenPreview() {
         HomeScreen(
             uiState = previewState,
             onProfileClick = {},
-            onEventClick = {}
+            onEventClick = {},
+            onHomeClick = {},
+            onStarListClick = {}
         )
     }
 }
@@ -322,7 +445,10 @@ private fun HomeScreenPreview() {
 private fun SearchBarPreview() {
     MaterialTheme {
         Box(modifier = Modifier.background(Color.White)) {
-            SearchBar(modifier = Modifier.padding(16.dp))
+            SearchBar(
+                modifier = Modifier.padding(16.dp),
+                onMenuClick = {}
+            )
         }
     }
 }
