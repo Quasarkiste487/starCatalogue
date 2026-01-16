@@ -1,6 +1,5 @@
 package com.example.starccatalogue.ui.list
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,13 +33,10 @@ class ListVM(
     private fun loadData() {
         viewModelScope.launch(Dispatchers.IO){
             val repo : StarDataSource = SimbadSQLSource(simbad = Simbad())
-            Log.w("ListVM", "repo initialized, loading stars")
-            val starList = repo.listStars(10)
-            Log.w("ListVM", "loaded $starList")
+            val starList = repo.listStars(10, starName)
             _stars.update {
                 starList
             }
-            Log.w("ListVM", "updated stars to $starList")
         }
     }
 }
