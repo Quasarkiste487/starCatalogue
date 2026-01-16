@@ -14,8 +14,37 @@ data class StarDetails(
     val type : String,
     )
 
+/**
+ * Abstraction for retrieving star catalogue data.
+ *
+ * Implementations are responsible for providing overview lists of stars as well
+ * as detailed information for a single star, typically by querying a remote or
+ * local data source.
+ *
+ * Implementations may throw implementation-specific exceptions (for example,
+ * networking or database errors). Callers should handle such failures according
+ * to their needs.
+ */
 interface StarDataSource {
+    /**
+     * Returns a list of at most [limit] stars with basic information.
+     *
+     * @param limit maximum number of stars to return. Implementations should not
+     *   return more than this number of items; they may return fewer.
+     * @return a list of [StarOverview] entries. If no stars are available or an
+     *   empty result is produced by the data source, this method returns an
+     *   empty list.
+     */
     fun ListStars(limit : Int) : List<StarOverview>
+
+    /**
+     * Returns detailed information about a single star identified by [oid].
+     *
+     * @param oid unique object identifier of the star in the underlying
+     *   catalogue.
+     * @return a [StarDetails] instance for the requested star, or `null` if no
+     *   star with the given [oid] exists in the data source.
+     */
     fun GetStarDetails(oid : Int) : StarDetails?
 }
 
