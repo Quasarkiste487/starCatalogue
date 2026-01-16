@@ -52,7 +52,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun StarsScreen(
-    starId: String,
+    starId: Int,
     onNavigateBack: () -> Unit,
     viewModel: StarsViewModel = StarsViewModel(starId),
 ) {
@@ -73,7 +73,7 @@ private fun StarsScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text(starState.id.ifEmpty { "Stern xy" }) },
+                title = { Text(starState.name) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -155,21 +155,19 @@ private fun HeroSection(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = starState.id.ifEmpty { "Stern" },
+                    text = starState.name,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     textAlign = TextAlign.Center
                 )
-                if (starState.magnitude.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Magnitude ${starState.magnitude}",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Color(0xFFE1BEE7), // Light purple
-                        textAlign = TextAlign.Center
-                    )
-                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Magnitude ${starState.magnitude}",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Color(0xFFE1BEE7), // Light purple
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
@@ -194,45 +192,36 @@ private fun DataCardsSection(
         )
 
         // ID Card
-        if (starState.id.isNotEmpty()) {
-            DataCard(
-                label = "Identifier",
-                value = starState.id,
-                icon = Icons.Outlined.LightMode
-            )
-        }
+        DataCard(
+            label = "Identifier",
+            value = starState.name,
+            icon = Icons.Outlined.LightMode
+        )
 
         // Magnitude & RA Row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (starState.magnitude.isNotEmpty()) {
                 DataCard(
-                    label = "Magnitude",
-                    value = starState.magnitude,
+                    label = "Declination",
+                    value = starState.dec.toString(),
                     icon = Icons.Filled.Star,
                     modifier = Modifier.weight(1f)
                 )
-            }
-            if (starState.ra.isNotEmpty()) {
                 DataCard(
-                    label = "RA",
-                    value = starState.ra,
+                    label = "Right Ascension",
+                    value = starState.ra.toString(),
                     icon = Icons.Outlined.MyLocation,
                     modifier = Modifier.weight(1f)
                 )
-            }
         }
 
-        // Dec Card
-        if (starState.dec.isNotEmpty()) {
-            DataCard(
-                label = "Declination",
-                value = starState.dec,
-                icon = Icons.Outlined.Explore
-            )
-        }
+        DataCard(
+            label = "Magnitude",
+            value = starState.magnitude.toString(),
+            icon = Icons.Outlined.Explore
+        )
     }
 }
 
@@ -292,28 +281,13 @@ private fun DataCard(
 private fun StarsScreenPreview() {
     StarsScreen(
         starState = StarUiState(
-            id = "Sirius",
-            magnitude = "-1.46",
-            ra = "101.287155",
-            dec = "-16.716116",
+            id = 0,
+            name = "Sirius",
+            magnitude = -1.46f,
+            ra = 101.287155f,
+            dec = -16.716116f,
             isLoading = false
         ),
         onNavigateBack = {}
     )
 }
-
-@Preview(showBackground = true, showSystemUi = true, name = "Loading State")
-@Composable
-private fun StarsScreenLoadingPreview() {
-    StarsScreen(
-        starState = StarUiState(
-            id = "",
-            magnitude = "",
-            ra = "",
-            dec = "",
-            isLoading = true
-        ),
-        onNavigateBack = {}
-    )
-}
-

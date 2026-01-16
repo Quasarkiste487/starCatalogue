@@ -74,7 +74,7 @@ class SimbadSQLSource(val simbad: Simbad) : StarDataSource{
                     row[2].toString(),
                 ))
             }
-        }catch(_: NumberFormatException){
+        }catch(_: Exception){
             println("Invalid table row: ${rowSequence.row}")
             return mutableListOf<StarOverview>()
         }
@@ -106,7 +106,7 @@ class SimbadSQLSource(val simbad: Simbad) : StarDataSource{
                 row[5].toString(),
                 row[6].toString(),
             )
-        }catch(_: NumberFormatException){
+        }catch(_: Exception){
             println("Invalid table row: $row")
             return null
         }

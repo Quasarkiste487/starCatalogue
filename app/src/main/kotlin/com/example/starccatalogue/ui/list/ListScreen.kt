@@ -115,7 +115,7 @@ private fun ListScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-
+            /*
             // Filters section
             FiltersSection(
                 magnitudeFilter = uiState.magnitudeFilter,
@@ -126,6 +126,7 @@ private fun ListScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
             )
+            */
 
             // Content section
             Box(

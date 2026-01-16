@@ -22,8 +22,8 @@ import androidx.navigation.toRoute
 import com.example.starccatalogue.ui.drawer.AppDrawer
 import com.example.starccatalogue.ui.home.HomeRoute
 import com.example.starccatalogue.ui.home.HomeScreen
-import com.example.starccatalogue.ui.list.ListRoute
-import com.example.starccatalogue.ui.list.ListScreen
+import com.example.starccatalogue.ui.list.ListR
+import com.example.starccatalogue.ui.list.ListS
 import com.example.starccatalogue.ui.stars.StarsRoute
 import com.example.starccatalogue.ui.stars.StarsScreen
 import com.example.starccatalogue.ui.theme.StarcCatalogueTheme
@@ -54,7 +54,7 @@ fun AppRoot() {
                     scope.launch { drawerState.close() }
                 },
                 onStarListClick = {
-                    navController.navigate(ListRoute)
+                    navController.navigate(ListR)
                     scope.launch { drawerState.close() }
                 },
             )
@@ -70,10 +70,17 @@ fun AppRoot() {
                 HomeScreen(
                     onOpenDrawer = {
                         scope.launch { drawerState.open() }
-                    })
+                    },
+                    onSearch = { starName ->
+                        navController.navigate(ListR(starName))
+                    }
+                )
             }
-            composable<ListRoute> {
-                ListScreen(onNavigateBack = { navController.popBackStack() }, onStarClick = {})
+            composable<ListR> {
+                ListS(onUpClick = { navController.popBackStack() },
+                    onStarClick = { star ->
+                    navController.navigate(StarsRoute(star))
+                })
             }
             composable<StarsRoute> { backStackEntry ->
                 val route = backStackEntry.toRoute<StarsRoute>()
