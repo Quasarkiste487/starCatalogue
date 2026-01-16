@@ -45,8 +45,6 @@ import androidx.compose.material3.Scaffold
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-// wird in MainActivity verwendet
-// in ComposobleRoute als Funktion die aufgerufen wird fürs darstellen
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
@@ -75,13 +73,15 @@ private fun HomeScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState()) // Homescreen ist scrollable
+                .verticalScroll(rememberScrollState())
         ) {
             SearchBar()
             Spacer(Modifier.height(16.dp))
             TopStarCard(onProfileClick = onProfileClick)
             Spacer(Modifier.height(16.dp))
-            BlogSection()
+            uiState.blogArticle?.let { article ->
+                BlogSection(article)
+            }
             Spacer(Modifier.height(16.dp))
             EventsList(
                 events = uiState.events,
@@ -192,7 +192,7 @@ private fun TopStarCard(onProfileClick: () -> Unit) {
 }
 
 @Composable
-private fun BlogSection() {
+private fun BlogSection(article: BlogArticle) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp)
@@ -201,23 +201,18 @@ private fun BlogSection() {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("15.07.2024", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
-            Text("Aktuelle Beobachtungen", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF545454)
-            )
-            Text(
-                "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF545454)
-            )
+            Text(article.date, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+            Text(article.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            article.paragraphs.forEach { paragraph ->
+                Text(
+                    paragraph,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF545454)
+                )
+            }
         }
     }
 }
-
-// EventRow ist jetzt im ViewModel definiert, daher hier entfernt
 
 @Composable
 private fun EventsList(
@@ -231,7 +226,6 @@ private fun EventsList(
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        // KEINE LazyColumn -> EventsList selbst scrollt nicht
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -285,6 +279,14 @@ private fun HomeScreenPreview() {
             EventRow("Sonnenfinsternis", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Taggesamtzeit - 10:00"),
             EventRow("Mars und Saturn stehen im Zwiespalt", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Stundenhalbzeit - 10:30"),
             EventRow("Pluto wird wieder Planet", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Normalzeit - 13:37")
+        ),
+        blogArticle = BlogArticle(
+            date = "15.07.2024",
+            title = "Aktuelle Beobachtungen",
+            paragraphs = listOf(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+            )
         )
     )
     MaterialTheme {
@@ -315,7 +317,15 @@ private fun TopStarCardPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun BlogSectionPreview() {
-    MaterialTheme { BlogSection() }
+    val article = BlogArticle(
+        date = "15.07.2024",
+        title = "Aktuelle Beobachtungen",
+        paragraphs = listOf(
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+        )
+    )
+    MaterialTheme { BlogSection(article) }
 }
 
 @Preview(showBackground = true, heightDp = 420)

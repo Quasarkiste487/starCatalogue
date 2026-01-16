@@ -12,9 +12,17 @@ data class EventRow(
     val time: String
 )
 
+// Datenklasse für den Blog-Artikel
+data class BlogArticle(
+    val date: String,
+    val title: String,
+    val paragraphs: List<String>
+)
+
 // UI-State für den HomeScreen
 data class HomeUiState(
-    val events: List<EventRow> = emptyList()
+    val events: List<EventRow> = emptyList(),
+    val blogArticle: BlogArticle? = null
 )
 
 class HomeViewModel : ViewModel() {
@@ -28,7 +36,6 @@ class HomeViewModel : ViewModel() {
 
     private fun loadData() {
         // TODO: stern des tages laden, blog artikel und nächste events
-        // vorerst Dummy-Daten für Events
         val events = listOf(
             EventRow(
                 title = "Sonnenfinsternis",
@@ -46,6 +53,19 @@ class HomeViewModel : ViewModel() {
                 time = "Normalzeit - 13:37"
             )
         )
-        _uiState.value = HomeUiState(events = events)
+
+            val blogArticle = BlogArticle(
+                date = "15.07.2024",
+                title = "Aktuelle Beobachtungen",
+                paragraphs = listOf(
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                    "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                )
+            )
+
+            _uiState.value = HomeUiState(
+                events = events,
+                blogArticle = blogArticle
+            )
     }
 }
