@@ -39,6 +39,7 @@ import androidx.navigation.toRoute
 import com.example.starccatalogue.ui.home.HomeRoute
 import com.example.starccatalogue.ui.home.HomeScreen
 import com.example.starccatalogue.ui.list.ListRoute
+import com.example.starccatalogue.ui.list.ListScreen
 import com.example.starccatalogue.ui.stars.StarsRoute
 import com.example.starccatalogue.ui.stars.StarsScreen
 import com.example.starccatalogue.ui.theme.StarcCatalogueTheme
@@ -82,7 +83,16 @@ fun AppRoot() {
             modifier = Modifier.fillMaxSize(),
         ) {
             composable<HomeRoute> {
-                HomeScreen()
+                HomeScreen(
+                    onOpenDrawer = {
+                        scope.launch { drawerState.open() }
+                    })
+            }
+            composable<ListRoute> {
+                ListScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    onStarClick = {}
+                )
             }
             composable<StarsRoute> { backStackEntry ->
                 val route = backStackEntry.toRoute<StarsRoute>()

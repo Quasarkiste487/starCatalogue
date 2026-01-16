@@ -53,6 +53,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
     onProfileClick: () -> Unit = {},
     onEventClick: (EventRow) -> Unit = {},
+    onOpenDrawer: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -60,6 +61,7 @@ fun HomeScreen(
         uiState = uiState,
         onProfileClick = onProfileClick,
         onEventClick = onEventClick,
+        onOpenDrawer = onOpenDrawer,
     )
 }
 
@@ -69,6 +71,7 @@ private fun HomeScreen(
     uiState: HomeUiState,
     onProfileClick: () -> Unit,
     onEventClick: (EventRow) -> Unit,
+    onOpenDrawer: () -> Unit,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -78,7 +81,7 @@ private fun HomeScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            SearchBar()
+            SearchBar(onMenuClick = onOpenDrawer)
             Spacer(Modifier.height(16.dp))
             TopStarCard(
                 topStar = uiState.topStar, onProfileClick = onProfileClick
@@ -332,6 +335,7 @@ private fun HomeScreenPreview() {
             uiState = previewState,
             onProfileClick = {},
             onEventClick = {},
+            onOpenDrawer = {},
         )
     }
 }
