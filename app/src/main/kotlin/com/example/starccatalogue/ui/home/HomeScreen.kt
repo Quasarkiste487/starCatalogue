@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Menu
@@ -38,27 +40,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 // wird in MainActivity verwendet
 // in ComposobleRoute als Funktion die aufgerufen wird fürs darstellen
 @Composable
 fun HomeScreen(
-    /* TODO: ViewModel Parameter einfügen */
+    viewModel: HomeViewModel = viewModel(),
+    onProfileClick: () -> Unit = {},
+    onEventClick: (EventRow) -> Unit = {}
 ) {
-    /* TODO: Daten für Screen aus ViewModel holen*/
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     HomeScreen(
-        onProfileClick = { /* TODO */ },
-        onEventClick = { /* TODO */ }
+        uiState = uiState,
+        onProfileClick = onProfileClick,
+        onEventClick = onEventClick
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
+    uiState: HomeUiState,
     onProfileClick: () -> Unit,
     onEventClick: (EventRow) -> Unit,
 ) {
@@ -68,6 +75,7 @@ private fun HomeScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
                 .padding(16.dp)
+                .verticalScroll(rememberScrollState()) // Homescreen ist scrollable
         ) {
             SearchBar()
             Spacer(Modifier.height(16.dp))
@@ -75,7 +83,10 @@ private fun HomeScreen(
             Spacer(Modifier.height(16.dp))
             BlogSection()
             Spacer(Modifier.height(16.dp))
-            EventsList(onEventClick = onEventClick)
+            EventsList(
+                events = uiState.events,
+                onEventClick = onEventClick
+            )
         }
     }
 }
@@ -206,19 +217,25 @@ private fun BlogSection() {
     }
 }
 
-private data class EventRow(val title: String, val subtitle: String, val time: String)
+// EventRow ist jetzt im ViewModel definiert, daher hier entfernt
 
 @Composable
-private fun EventsList(onEventClick: (EventRow) -> Unit) {
-    val items = listOf(
-        EventRow("Sonnenfinterisnis", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Taggesamtzeit - 10:00"),
-        EventRow("Mars und Saturn stehen im Zwiespalt", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Stundenhalbzeit - 10:30"),
-        EventRow("Plute wird wieder Planet", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Normalzeit - 13:37")
-    )
+private fun EventsList(
+    events: List<EventRow>,
+    onEventClick: (EventRow) -> Unit
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text("Nächste Himmelsevent", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 8.dp))
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(items) { event ->
+        Text(
+            "Nächste Himmelevents",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        // KEINE LazyColumn -> EventsList selbst scrollt nicht
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            events.forEach { event ->
                 EventCard(event, onClick = { onEventClick(event) })
             }
         }
@@ -246,7 +263,9 @@ private fun EventCard(event: EventRow, onClick: () -> Unit) {
                 Icon(imageVector = Icons.Filled.Star, contentDescription = null, tint = Color(0xFF9AA0A6))
             }
             Column(
-                modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(event.title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
@@ -261,8 +280,16 @@ private fun EventCard(event: EventRow, onClick: () -> Unit) {
 @Preview(showBackground = true, heightDp = 800)
 @Composable
 private fun HomeScreenPreview() {
+    val previewState = HomeUiState(
+        events = listOf(
+            EventRow("Sonnenfinsternis", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Taggesamtzeit - 10:00"),
+            EventRow("Mars und Saturn stehen im Zwiespalt", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Stundenhalbzeit - 10:30"),
+            EventRow("Pluto wird wieder Planet", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Normalzeit - 13:37")
+        )
+    )
     MaterialTheme {
         HomeScreen(
+            uiState = previewState,
             onProfileClick = {},
             onEventClick = {}
         )
@@ -294,5 +321,12 @@ private fun BlogSectionPreview() {
 @Preview(showBackground = true, heightDp = 420)
 @Composable
 private fun EventsListPreview() {
-    MaterialTheme { EventsList(onEventClick = {}) }
+    MaterialTheme { EventsList(
+        events = listOf(
+            EventRow("Sonnenfinsternis", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Taggesamtzeit - 10:00"),
+            EventRow("Mars und Saturn stehen im Zwiespalt", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Stundenhalbzeit - 10:30"),
+            EventRow("Pluto wird wieder Planet", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Normalzeit - 13:37")
+        ),
+        onEventClick = {}
+    ) }
 }
