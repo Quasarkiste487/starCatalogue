@@ -1,19 +1,23 @@
 package com.example.starccatalogue.ui.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Menu
@@ -21,9 +25,11 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,29 +44,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
-// wird in MainActivity verwendet
-// in ComposobleRoute als Funktion die aufgerufen wird fürs darstellen
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
-    /* TODO: ViewModel Parameter einfügen */
+    viewModel: HomeViewModel = viewModel(),
+    onProfileClick: () -> Unit = {},
+    onEventClick: (EventRow) -> Unit = {},
+    onOpenDrawer: () -> Unit = {},
 ) {
-    /* TODO: Daten für Screen aus ViewModel holen*/
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     HomeScreen(
-        onProfileClick = { /* TODO */ },
-        onEventClick = { /* TODO */ }
+        uiState = uiState,
+        onProfileClick = onProfileClick,
+        onEventClick = onEventClick,
+        onOpenDrawer = onOpenDrawer,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
+    uiState: HomeUiState,
     onProfileClick: () -> Unit,
     onEventClick: (EventRow) -> Unit,
+    onOpenDrawer: () -> Unit,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -68,14 +79,21 @@ private fun HomeScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
                 .padding(16.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-            SearchBar()
+            SearchBar(onMenuClick = onOpenDrawer)
             Spacer(Modifier.height(16.dp))
-            TopStarCard(onProfileClick = onProfileClick)
+            TopStarCard(
+                topStar = uiState.topStar, onProfileClick = onProfileClick
+            )
             Spacer(Modifier.height(16.dp))
-            BlogSection()
+            uiState.blogArticle?.let { article ->
+                BlogSection(article)
+            }
             Spacer(Modifier.height(16.dp))
-            EventsList(onEventClick = onEventClick)
+            EventsList(
+                events = uiState.events, onEventClick = onEventClick
+            )
         }
     }
 }
@@ -83,7 +101,8 @@ private fun HomeScreen(
 @Composable
 private fun SearchBar(
     modifier: Modifier = Modifier,
-    placeholder: String = "Sterne"
+    placeholder: String = "Sterne",
+    onMenuClick: () -> Unit = {},
 ) {
     var value by remember { mutableStateOf("") }
     Surface(
@@ -99,7 +118,7 @@ private fun SearchBar(
                 .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { /* TODO: handle menu */ }) {
+            IconButton(onClick = onMenuClick) {
                 Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menü")
             }
             BasicTextField(
@@ -127,10 +146,11 @@ private fun SearchBar(
 }
 
 @Composable
-private fun TopStarCard(onProfileClick: () -> Unit) {
+private fun TopStarCard(
+    topStar: TopStar?, onProfileClick: () -> Unit
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp)
+        modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -155,21 +175,29 @@ private fun TopStarCard(onProfileClick: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.Start
             ) {
+                // Name des Sterns groß oben
                 Text(
-                    text = "Heutiger Top Stern",
+                    text = topStar?.name ?: "Unbekannter Stern",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Start
                 )
+                // "Top Stern" darunter als Untertitel
                 Text(
-                    text = "so schön ja",
+                    text = "Heutiger Top Stern",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Start
+                )
+                // Beschreibung bleibt
+                Text(
+                    text = topStar?.description ?: "Keine Beschreibung vorhanden.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray,
                     textAlign = TextAlign.Start
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                 ) {
                     Button(onClick = onProfileClick) {
                         Text("zum Profil")
@@ -181,44 +209,45 @@ private fun TopStarCard(onProfileClick: () -> Unit) {
 }
 
 @Composable
-private fun BlogSection() {
+private fun BlogSection(article: BlogArticle) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp)
+        modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("15.07.2024", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
-            Text("Aktuelle Beobachtungen", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(article.date, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
             Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF545454)
+                article.title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
             )
-            Text(
-                "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF545454)
-            )
+            article.paragraphs.forEach { paragraph ->
+                Text(
+                    paragraph,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF545454)
+                )
+            }
         }
     }
 }
 
-private data class EventRow(val title: String, val subtitle: String, val time: String)
-
 @Composable
-private fun EventsList(onEventClick: (EventRow) -> Unit) {
-    val items = listOf(
-        EventRow("Sonnenfinterisnis", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Taggesamtzeit - 10:00"),
-        EventRow("Mars und Saturn stehen im Zwiespalt", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Stundenhalbzeit - 10:30"),
-        EventRow("Plute wird wieder Planet", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Normalzeit - 13:37")
-    )
+private fun EventsList(
+    events: List<EventRow>, onEventClick: (EventRow) -> Unit
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text("Nächste Himmelsevent", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 8.dp))
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(items) { event ->
+        Text(
+            "Nächste Himmelevents",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            events.forEach { event ->
                 EventCard(event, onClick = { onEventClick(event) })
             }
         }
@@ -234,8 +263,7 @@ private fun EventCard(event: EventRow, onClick: () -> Unit) {
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
@@ -243,28 +271,71 @@ private fun EventCard(event: EventRow, onClick: () -> Unit) {
                     .background(Color(0xFFE6EAF1), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(imageVector = Icons.Filled.Star, contentDescription = null, tint = Color(0xFF9AA0A6))
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = null,
+                    tint = Color(0xFF9AA0A6)
+                )
             }
             Column(
-                modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text(event.title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                Text(
+                    event.title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
                 Text(event.subtitle, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
                 Text(event.time, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
             }
-            Icon(imageVector = Icons.Filled.ChevronRight, contentDescription = null, tint = Color.Gray)
+            Icon(
+                imageVector = Icons.Filled.ChevronRight,
+                contentDescription = null,
+                tint = Color.Gray
+            )
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true, heightDp = 800)
 @Composable
 private fun HomeScreenPreview() {
+    val previewState = HomeUiState(
+        events = listOf(
+            EventRow(
+                "Sonnenfinsternis",
+                "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+                "Taggesamtzeit - 10:00"
+            ),
+            EventRow(
+                "Mars und Saturn stehen im Zwiespalt",
+                "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+                "Stundenhalbzeit - 10:30"
+            ),
+            EventRow(
+                "Pluto wird wieder Planet",
+                "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+                "Normalzeit - 13:37"
+            )
+        ), blogArticle = BlogArticle(
+            date = "15.07.2024", title = "Aktuelle Beobachtungen", paragraphs = listOf(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+            )
+        ), topStar = TopStar(
+            name = "Sirius", description = "so schön ja"
+        )
+    )
     MaterialTheme {
         HomeScreen(
+            uiState = previewState,
             onProfileClick = {},
-            onEventClick = {}
+            onEventClick = {},
+            onOpenDrawer = {},
         )
     }
 }
@@ -274,7 +345,8 @@ private fun HomeScreenPreview() {
 private fun SearchBarPreview() {
     MaterialTheme {
         Box(modifier = Modifier.background(Color.White)) {
-            SearchBar(modifier = Modifier.padding(16.dp))
+            SearchBar(
+                modifier = Modifier.padding(16.dp), onMenuClick = {})
         }
     }
 }
@@ -282,17 +354,45 @@ private fun SearchBarPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun TopStarCardPreview() {
-    MaterialTheme { TopStarCard(onProfileClick = {}) }
+    val topStar = TopStar(
+        name = "Sirius", description = "so schön ja"
+    )
+    MaterialTheme { TopStarCard(topStar = topStar, onProfileClick = {}) }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun BlogSectionPreview() {
-    MaterialTheme { BlogSection() }
+    val article = BlogArticle(
+        date = "15.07.2024", title = "Aktuelle Beobachtungen", paragraphs = listOf(
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+        )
+    )
+    MaterialTheme { BlogSection(article) }
 }
 
 @Preview(showBackground = true, heightDp = 420)
 @Composable
 private fun EventsListPreview() {
-    MaterialTheme { EventsList(onEventClick = {}) }
+    MaterialTheme {
+        EventsList(
+            events = listOf(
+                EventRow(
+                    "Sonnenfinsternis",
+                    "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+                    "Taggesamtzeit - 10:00"
+                ),
+                EventRow(
+                    "Mars und Saturn stehen im Zwiespalt",
+                    "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+                    "Stundenhalbzeit - 10:30"
+                ),
+                EventRow(
+                    "Pluto wird wieder Planet",
+                    "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+                    "Normalzeit - 13:37"
+                )
+            ), onEventClick = {})
+    }
 }
