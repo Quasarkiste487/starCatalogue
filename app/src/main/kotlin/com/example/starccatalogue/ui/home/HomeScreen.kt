@@ -7,10 +7,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,10 +25,11 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,16 +44,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -61,8 +53,6 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
     onProfileClick: () -> Unit = {},
     onEventClick: (EventRow) -> Unit = {},
-    onHomeClick: () -> Unit = {},
-    onStarListClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -70,70 +60,37 @@ fun HomeScreen(
         uiState = uiState,
         onProfileClick = onProfileClick,
         onEventClick = onEventClick,
-        onHomeClick = onHomeClick,
-        onStarListClick = onStarListClick
     )
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
     uiState: HomeUiState,
     onProfileClick: () -> Unit,
     onEventClick: (EventRow) -> Unit,
-    onHomeClick: () -> Unit,
-    onStarListClick: () -> Unit,
 ) {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            AppDrawer(
-                appName = "Star Catalogue",
-                onHomeClick = {
-                    onHomeClick()
-                    scope.launch { drawerState.close() }
-                },
-                onStarListClick = {
-                    onStarListClick()
-                    scope.launch { drawerState.close() }
-                }
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            SearchBar()
+            Spacer(Modifier.height(16.dp))
+            TopStarCard(
+                topStar = uiState.topStar, onProfileClick = onProfileClick
             )
-        }
-    ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                SearchBar(
-                    onMenuClick = {
-                        scope.launch {
-                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                        }
-                    }
-                )
-                Spacer(Modifier.height(16.dp))
-                TopStarCard(
-                    topStar = uiState.topStar,
-                    onProfileClick = onProfileClick
-                )
-                Spacer(Modifier.height(16.dp))
-                uiState.blogArticle?.let { article ->
-                    BlogSection(article)
-                }
-                Spacer(Modifier.height(16.dp))
-                EventsList(
-                    events = uiState.events,
-                    onEventClick = onEventClick
-                )
+            Spacer(Modifier.height(16.dp))
+            uiState.blogArticle?.let { article ->
+                BlogSection(article)
             }
+            Spacer(Modifier.height(16.dp))
+            EventsList(
+                events = uiState.events, onEventClick = onEventClick
+            )
         }
     }
 }
@@ -185,89 +142,12 @@ private fun SearchBar(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-private fun AppDrawer(
-    appName: String,
-    onHomeClick: () -> Unit,
-    onStarListClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth(0.8f) // Drawer-Breite
-            .background(Color.White)
-    ) {
-        // Banner oben mit App-Namen
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFF7970FF))
-                .padding(24.dp),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            Text(
-                text = appName,
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Menüeinträge
-        NavigationDrawerItem(
-            label = { Text("Home") },
-            selected = false,
-            onClick = onHomeClick,
-            modifier = Modifier.padding(horizontal = 12.dp),
-            colors = NavigationDrawerItemDefaults.colors(
-                selectedContainerColor = Color(0xFFE6EAF1)
-            )
-        )
-
-        NavigationDrawerItem(
-            label = { Text("Sternenliste") },
-            selected = false,
-            onClick = onStarListClick,
-            modifier = Modifier.padding(horizontal = 12.dp),
-            colors = NavigationDrawerItemDefaults.colors(
-                selectedContainerColor = Color(0xFFE6EAF1)
-            )
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        // App-Infos unten
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(
-                text = "Version 1.0.0", // feste Version oder später per Parameter
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
-            Text(
-                text = "© 2026 Star Catalogue",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
-        }
-    }
-}
-
 @Composable
 private fun TopStarCard(
-    topStar: TopStar?,
-    onProfileClick: () -> Unit
+    topStar: TopStar?, onProfileClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp)
+        modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -314,8 +194,7 @@ private fun TopStarCard(
                     textAlign = TextAlign.Start
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                 ) {
                     Button(onClick = onProfileClick) {
                         Text("zum Profil")
@@ -329,15 +208,17 @@ private fun TopStarCard(
 @Composable
 private fun BlogSection(article: BlogArticle) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp)
+        modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(article.date, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
-            Text(article.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                article.title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
             article.paragraphs.forEach { paragraph ->
                 Text(
                     paragraph,
@@ -351,8 +232,7 @@ private fun BlogSection(article: BlogArticle) {
 
 @Composable
 private fun EventsList(
-    events: List<EventRow>,
-    onEventClick: (EventRow) -> Unit
+    events: List<EventRow>, onEventClick: (EventRow) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -380,8 +260,7 @@ private fun EventCard(event: EventRow, onClick: () -> Unit) {
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
@@ -389,7 +268,11 @@ private fun EventCard(event: EventRow, onClick: () -> Unit) {
                     .background(Color(0xFFE6EAF1), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(imageVector = Icons.Filled.Star, contentDescription = null, tint = Color(0xFF9AA0A6))
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = null,
+                    tint = Color(0xFF9AA0A6)
+                )
             }
             Column(
                 modifier = Modifier
@@ -397,11 +280,19 @@ private fun EventCard(event: EventRow, onClick: () -> Unit) {
                     .padding(horizontal = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text(event.title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                Text(
+                    event.title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
                 Text(event.subtitle, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
                 Text(event.time, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
             }
-            Icon(imageVector = Icons.Filled.ChevronRight, contentDescription = null, tint = Color.Gray)
+            Icon(
+                imageVector = Icons.Filled.ChevronRight,
+                contentDescription = null,
+                tint = Color.Gray
+            )
         }
     }
 }
@@ -412,21 +303,28 @@ private fun EventCard(event: EventRow, onClick: () -> Unit) {
 private fun HomeScreenPreview() {
     val previewState = HomeUiState(
         events = listOf(
-            EventRow("Sonnenfinsternis", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Taggesamtzeit - 10:00"),
-            EventRow("Mars und Saturn stehen im Zwiespalt", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Stundenhalbzeit - 10:30"),
-            EventRow("Pluto wird wieder Planet", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Normalzeit - 13:37")
-        ),
-        blogArticle = BlogArticle(
-            date = "15.07.2024",
-            title = "Aktuelle Beobachtungen",
-            paragraphs = listOf(
+            EventRow(
+                "Sonnenfinsternis",
+                "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+                "Taggesamtzeit - 10:00"
+            ),
+            EventRow(
+                "Mars und Saturn stehen im Zwiespalt",
+                "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+                "Stundenhalbzeit - 10:30"
+            ),
+            EventRow(
+                "Pluto wird wieder Planet",
+                "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+                "Normalzeit - 13:37"
+            )
+        ), blogArticle = BlogArticle(
+            date = "15.07.2024", title = "Aktuelle Beobachtungen", paragraphs = listOf(
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                 "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
             )
-        ),
-        topStar = TopStar(
-            name = "Sirius",
-            description = "so schön ja"
+        ), topStar = TopStar(
+            name = "Sirius", description = "so schön ja"
         )
     )
     MaterialTheme {
@@ -434,8 +332,6 @@ private fun HomeScreenPreview() {
             uiState = previewState,
             onProfileClick = {},
             onEventClick = {},
-            onHomeClick = {},
-            onStarListClick = {}
         )
     }
 }
@@ -446,9 +342,7 @@ private fun SearchBarPreview() {
     MaterialTheme {
         Box(modifier = Modifier.background(Color.White)) {
             SearchBar(
-                modifier = Modifier.padding(16.dp),
-                onMenuClick = {}
-            )
+                modifier = Modifier.padding(16.dp), onMenuClick = {})
         }
     }
 }
@@ -457,8 +351,7 @@ private fun SearchBarPreview() {
 @Composable
 private fun TopStarCardPreview() {
     val topStar = TopStar(
-        name = "Sirius",
-        description = "so schön ja"
+        name = "Sirius", description = "so schön ja"
     )
     MaterialTheme { TopStarCard(topStar = topStar, onProfileClick = {}) }
 }
@@ -467,9 +360,7 @@ private fun TopStarCardPreview() {
 @Composable
 private fun BlogSectionPreview() {
     val article = BlogArticle(
-        date = "15.07.2024",
-        title = "Aktuelle Beobachtungen",
-        paragraphs = listOf(
+        date = "15.07.2024", title = "Aktuelle Beobachtungen", paragraphs = listOf(
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
         )
@@ -480,12 +371,24 @@ private fun BlogSectionPreview() {
 @Preview(showBackground = true, heightDp = 420)
 @Composable
 private fun EventsListPreview() {
-    MaterialTheme { EventsList(
-        events = listOf(
-            EventRow("Sonnenfinsternis", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Taggesamtzeit - 10:00"),
-            EventRow("Mars und Saturn stehen im Zwiespalt", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Stundenhalbzeit - 10:30"),
-            EventRow("Pluto wird wieder Planet", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Normalzeit - 13:37")
-        ),
-        onEventClick = {}
-    ) }
+    MaterialTheme {
+        EventsList(
+            events = listOf(
+                EventRow(
+                    "Sonnenfinsternis",
+                    "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+                    "Taggesamtzeit - 10:00"
+                ),
+                EventRow(
+                    "Mars und Saturn stehen im Zwiespalt",
+                    "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+                    "Stundenhalbzeit - 10:30"
+                ),
+                EventRow(
+                    "Pluto wird wieder Planet",
+                    "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+                    "Normalzeit - 13:37"
+                )
+            ), onEventClick = {})
+    }
 }
