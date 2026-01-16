@@ -21,19 +21,27 @@ class ListVM(
     private val starName: String = savedStateHandle
         .toRoute<ListR>()
         .starName
-    val searchQuery: String
-        get() = starName
+    private val _searchQuery: MutableStateFlow<String> = MutableStateFlow(starName)
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
     private val _stars: MutableStateFlow<List<StarOverview>> = MutableStateFlow(emptyList())
     val stars: StateFlow<List<StarOverview>> = _stars.asStateFlow()
 
     init {
-        loadData()
+        loadData(starName)
     }
 
-    private fun loadData() {
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+    fun search() {
+        loadData(_searchQuery.value)
+    }
+
+    private fun loadData(query: String) {
         viewModelScope.launch(Dispatchers.IO){
             val repo : StarDataSource = SimbadSQLSource(simbad = Simbad())
-            val starList = repo.listStars(10, starName)
+            val starList = repo.listStars(10, query)
             _stars.update {
                 starList
             }

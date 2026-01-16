@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -47,12 +49,14 @@ fun ListS (
     viewModel: ListVM = viewModel(),
 ) {
     val stars by viewModel.stars.collectAsStateWithLifecycle()
-    val searchQuery = viewModel.searchQuery
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     ListS(
         stars = stars,
         searchQuery = searchQuery,
         onUpClick = onUpClick,
         onStarClick = onStarClick,
+        onSearchQueryChange = viewModel::updateSearchQuery,
+        onSearch = viewModel::search,
     )
 
 }
@@ -64,6 +68,8 @@ private fun ListS(
     searchQuery: String,
     onUpClick: () -> Unit,
     onStarClick: (Int) -> Unit,
+    onSearchQueryChange: (String) -> Unit,
+    onSearch: () -> Unit,
 ) {
     Scaffold(
     modifier = Modifier.fillMaxSize(),
@@ -78,7 +84,11 @@ private fun ListS(
                 }
             },
             title = {
-                Text(searchQuery.ifBlank { "Suchergebnisse" })
+                SearchTextField(
+                    value = searchQuery,
+                    onValueChange = onSearchQueryChange,
+                    onSearch = onSearch,
+                )
             },
             modifier = Modifier.fillMaxWidth(),
         )
@@ -153,6 +163,27 @@ private fun ListS(
         }
     }
 }
+
+@Composable
+private fun SearchTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    onSearch: () -> Unit,
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        singleLine = true,
+        placeholder = { Text("Suchergebnisse") },
+        trailingIcon = {
+            IconButton(onClick = onSearch) {
+                Icon(Icons.Filled.Search, contentDescription = "Search")
+            }
+        },
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -167,6 +198,8 @@ private fun ListScreenPreview() {
             searchQuery = "Sirius",
             onUpClick = {},
             onStarClick = {},
+            onSearchQueryChange = {},
+            onSearch = {},
         )
     }
 }
