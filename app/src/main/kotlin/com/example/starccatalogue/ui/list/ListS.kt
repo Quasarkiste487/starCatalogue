@@ -37,11 +37,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.starccatalogue.network.StarOverview
 import com.example.starccatalogue.ui.theme.StarcCatalogueTheme
 
 @Composable
 fun ListS (
-    onStarClick: (String) -> Unit,
+    onStarClick: (Int) -> Unit,
     onUpClick: () -> Unit,
     viewModel: ListVM = viewModel(),
 ) {
@@ -59,10 +60,10 @@ fun ListS (
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ListS(
-    stars: List<StarItem>,
+    stars: List<StarOverview>,
     searchQuery: String,
     onUpClick: () -> Unit,
-    onStarClick: (String) -> Unit,
+    onStarClick: (Int) -> Unit,
 ) {
     Scaffold(
     modifier = Modifier.fillMaxSize(),
@@ -92,7 +93,7 @@ private fun ListS(
         ) {
             items(stars) { star ->
                 Card(
-                    onClick = { onStarClick(star.name) },
+                    onClick = { onStarClick(star.oid) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     elevation = CardDefaults.cardElevation(
@@ -131,7 +132,7 @@ private fun ListS(
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    text = star.type,
+                                    text = star.typ,
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.alpha(0.8f)
@@ -159,11 +160,9 @@ private fun ListScreenPreview() {
     StarcCatalogueTheme {
         ListS(
             stars = listOf(
-                StarItem(name = "Sirius", type = "typ 1"),
-                StarItem(name = "Canopus", type = "typ 2"),
-                StarItem(name = "Arcturus", type = "typ 2"),
-                StarItem(name = "Vega", type = "typ 2"),
-                StarItem(name = "Capella", type = "typ 4"),
+                StarOverview(1, "Sirius", "Main Sequence"),
+                StarOverview(2, "Canopus", "Supergiant"),
+                StarOverview(3, "Arcturus", "Giant"),
             ),
             searchQuery = "Sirius",
             onUpClick = {},
