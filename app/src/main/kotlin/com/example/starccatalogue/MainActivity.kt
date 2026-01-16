@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
-                    startDestination = StarsRoute(starId = "* alf CMa"),
+                    startDestination = HomeRoute,
                     enterTransition = { EnterTransition.None },
                     exitTransition = { ExitTransition.None },
                     modifier = Modifier.fillMaxSize(),
