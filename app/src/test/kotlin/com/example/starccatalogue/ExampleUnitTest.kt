@@ -3,6 +3,8 @@ package com.example.starccatalogue
 import com.example.starccatalogue.network.QueryScript
 import com.example.starccatalogue.network.Simbad
 import com.example.starccatalogue.network.SimbadResponse
+import com.example.starccatalogue.network.SimbadSQLSource
+import com.example.starccatalogue.network.StarDataSource
 import com.example.starccatalogue.network.printAll
 import org.junit.Test
 import uk.ac.starlink.table.StarTable
@@ -41,11 +43,9 @@ class ExampleUnitTest {
     @Test
     fun fetchStardataSQL(){
         val query = """
-        SELECT TOP 100 id, V as mag, ra, dec  from ident
-        JOIN allfluxes USING(oidref)
-        JOIN basic on oid = oidref
-        WHERE id LIKE '%NAME%'
-        ORDER BY V
+        SELECT TOP 100 oidref, id from ident
+        JOIN allfluxes using(oidref)
+        order by V
         """.trimIndent()
 
         var raw : SimbadResponse?
@@ -62,5 +62,16 @@ class ExampleUnitTest {
         })
 
         table.printAll()
+    }
+
+    @Test
+    fun fetchDataRepo(){
+        val repo : StarDataSource = SimbadSQLSource(simbad = Simbad())
+        val list = repo.ListStars(10)
+        list.forEach { println(it) }
+
+        val first = repo.GetStarDetails(list[0].oid)
+        println("Sirius: ")
+        println(first)
     }
 }

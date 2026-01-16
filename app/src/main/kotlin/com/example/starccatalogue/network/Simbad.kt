@@ -24,7 +24,7 @@ class Simbad (private val mirrorUrl : String = DEFAULT_MIRROR){
         const val DEFAULT_MIRROR = "https://simbad.cds.unistra.fr/simbad"
     }
 
-    /**
+    /**            if ()
      * Fetches data from SIMBAD by executing a script query.
      * @param queryScript The query script to execute
      * @return A SimbadResponse containing the response stream
