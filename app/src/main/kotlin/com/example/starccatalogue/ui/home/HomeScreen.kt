@@ -77,7 +77,10 @@ private fun HomeScreen(
         ) {
             SearchBar()
             Spacer(Modifier.height(16.dp))
-            TopStarCard(onProfileClick = onProfileClick)
+            TopStarCard(
+                topStar = uiState.topStar,
+                onProfileClick = onProfileClick
+            )
             Spacer(Modifier.height(16.dp))
             uiState.blogArticle?.let { article ->
                 BlogSection(article)
@@ -138,7 +141,10 @@ private fun SearchBar(
 }
 
 @Composable
-private fun TopStarCard(onProfileClick: () -> Unit) {
+private fun TopStarCard(
+    topStar: TopStar?,
+    onProfileClick: () -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp)
@@ -166,14 +172,23 @@ private fun TopStarCard(onProfileClick: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.Start
             ) {
+                // Name des Sterns groß oben
                 Text(
-                    text = "Heutiger Top Stern",
+                    text = topStar?.name ?: "Unbekannter Stern",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Start
                 )
+                // "Top Stern" darunter als Untertitel
                 Text(
-                    text = "so schön ja",
+                    text = "Heutiger Top Stern",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Start
+                )
+                // Beschreibung bleibt
+                Text(
+                    text = topStar?.description ?: "Keine Beschreibung vorhanden.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray,
                     textAlign = TextAlign.Start
@@ -287,6 +302,10 @@ private fun HomeScreenPreview() {
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                 "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
             )
+        ),
+        topStar = TopStar(
+            name = "Sirius",
+            description = "so schön ja"
         )
     )
     MaterialTheme {
@@ -311,7 +330,11 @@ private fun SearchBarPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun TopStarCardPreview() {
-    MaterialTheme { TopStarCard(onProfileClick = {}) }
+    val topStar = TopStar(
+        name = "Sirius",
+        description = "so schön ja"
+    )
+    MaterialTheme { TopStarCard(topStar = topStar, onProfileClick = {}) }
 }
 
 @Preview(showBackground = true)

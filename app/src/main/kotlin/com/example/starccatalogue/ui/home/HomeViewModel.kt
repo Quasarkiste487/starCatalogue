@@ -19,10 +19,17 @@ data class BlogArticle(
     val paragraphs: List<String>
 )
 
+// Datenklasse für den Top-Stern
+data class TopStar(
+    val name: String,
+    val description: String
+)
+
 // UI-State für den HomeScreen
 data class HomeUiState(
     val events: List<EventRow> = emptyList(),
-    val blogArticle: BlogArticle? = null
+    val blogArticle: BlogArticle? = null,
+    val topStar: TopStar? = null
 )
 
 class HomeViewModel : ViewModel() {
@@ -63,9 +70,15 @@ class HomeViewModel : ViewModel() {
                 )
             )
 
-            _uiState.value = HomeUiState(
-                events = events,
-                blogArticle = blogArticle
-            )
+        val topStar = TopStar(
+            name = "Sirius",
+            description = "so schön ja"
+        )
+
+        _uiState.value = HomeUiState(
+            events = events,
+            blogArticle = blogArticle,
+            topStar = topStar
+        )
     }
 }
