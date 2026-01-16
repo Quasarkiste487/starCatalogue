@@ -48,25 +48,17 @@ class ListViewModel : ViewModel() {
 
     fun updateSearchQuery(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
-        if (query.isNotBlank()) {
-            searchStars()
-        } else {
-            _uiState.update { it.copy(stars = emptyList(), errorMessage = null) }
-        }
+        searchStars()
     }
 
     fun updateMagnitudeFilter(filter: MagnitudeFilter) {
         _uiState.update { it.copy(magnitudeFilter = filter) }
-        if (_uiState.value.searchQuery.isNotBlank()) {
-            searchStars()
-        }
+        searchStars()
     }
 
     fun updateStarTypeFilter(filter: StarTypeFilter) {
         _uiState.update { it.copy(starTypeFilter = filter) }
-        if (_uiState.value.searchQuery.isNotBlank()) {
-            searchStars()
-        }
+        searchStars()
     }
 
     private fun searchStars() {

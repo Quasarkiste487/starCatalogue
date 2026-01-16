@@ -3,6 +3,7 @@ package com.example.starccatalogue.ui.stars
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.starccatalogue.network.Simbad
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,15 @@ class StarsViewModel(private val starId: String): ViewModel(){
 
     init {
         loadData()
+    }
+
+    companion object {
+        fun provideFactory(starId: String): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return StarsViewModel(starId) as T
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)

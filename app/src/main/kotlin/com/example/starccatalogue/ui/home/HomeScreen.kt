@@ -47,12 +47,15 @@ import androidx.compose.material3.Scaffold
 // in ComposobleRoute als Funktion die aufgerufen wird fürs darstellen
 @Composable
 fun HomeScreen(
-    /* TODO: ViewModel Parameter einfügen */
+    onProfileClick: (String) -> Unit,
+    onSearchClick: (String) -> Unit
 ) {
     /* TODO: Daten für Screen aus ViewModel holen*/
+    val todaysStarId = "Betelgeuse"
     HomeScreen(
-        onProfileClick = { /* TODO */ },
-        onEventClick = { /* TODO */ }
+        onProfileClick = { onProfileClick(todaysStarId) },
+        onEventClick = { /* TODO */ },
+        onSearchClick = onSearchClick
     )
 }
 
@@ -61,6 +64,7 @@ fun HomeScreen(
 private fun HomeScreen(
     onProfileClick: () -> Unit,
     onEventClick: (EventRow) -> Unit,
+    onSearchClick: (String) -> Unit
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -69,7 +73,7 @@ private fun HomeScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            SearchBar()
+            SearchBar(onSearch = onSearchClick)
             Spacer(Modifier.height(16.dp))
             TopStarCard(onProfileClick = onProfileClick)
             Spacer(Modifier.height(16.dp))
@@ -83,7 +87,8 @@ private fun HomeScreen(
 @Composable
 private fun SearchBar(
     modifier: Modifier = Modifier,
-    placeholder: String = "Sterne"
+    placeholder: String = "Sterne",
+    onSearch: (String) -> Unit
 ) {
     var value by remember { mutableStateOf("") }
     Surface(
@@ -119,7 +124,7 @@ private fun SearchBar(
                 }
                 innerTextField()
             }
-            IconButton(onClick = { /* TODO: handle search */ }) {
+            IconButton(onClick = { onSearch(value) }) {
                 Icon(imageVector = Icons.Filled.Search, contentDescription = "Suche")
             }
         }

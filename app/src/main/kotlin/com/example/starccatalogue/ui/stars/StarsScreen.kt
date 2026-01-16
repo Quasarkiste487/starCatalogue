@@ -48,13 +48,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun StarsScreen(
     starId: String,
     onNavigateBack: () -> Unit,
-    viewModel: StarsViewModel = StarsViewModel(starId),
+    viewModel: StarsViewModel = viewModel(factory = StarsViewModel.provideFactory(starId)),
 ) {
     val starState by viewModel.starState.collectAsStateWithLifecycle()
     StarsScreen(

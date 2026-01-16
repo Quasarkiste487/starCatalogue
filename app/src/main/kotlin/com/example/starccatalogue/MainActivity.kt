@@ -16,6 +16,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.starccatalogue.ui.home.HomeRoute
 import com.example.starccatalogue.ui.home.HomeScreen
+import com.example.starccatalogue.ui.list.ListRoute
+import com.example.starccatalogue.ui.list.ListScreen
 import com.example.starccatalogue.ui.stars.StarsRoute
 import com.example.starccatalogue.ui.stars.StarsScreen
 import com.example.starccatalogue.ui.theme.StarcCatalogueTheme
@@ -30,13 +32,30 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
-                    startDestination = StarsRoute(starId = "* alf CMa"),
+                    startDestination = HomeRoute,
                     enterTransition = { EnterTransition.None },
                     exitTransition = { ExitTransition.None },
                     modifier = Modifier.fillMaxSize(),
                 ) {
+                    composable<ListRoute> { backStackEntry ->
+                        val route = backStackEntry.toRoute<ListRoute>()
+                        ListScreen(
+                            initialSearchQuery = route.searchQuery,
+                            onNavigateBack = { navController.popBackStack() },
+                            onStarClick = { starId ->
+                                navController.navigate(StarsRoute(starId = starId))
+                            }
+                        )
+                    }
                     composable<HomeRoute> {
-                        HomeScreen()
+                        HomeScreen(
+                            onProfileClick = { starId ->
+                                navController.navigate(StarsRoute(starId = starId))
+                            },
+                            onSearchClick = { query ->
+                                navController.navigate(ListRoute(searchQuery = query))
+                            }
+                        )
                     }
                     composable<StarsRoute> { backStackEntry ->
                         val route = backStackEntry.toRoute<StarsRoute>()
