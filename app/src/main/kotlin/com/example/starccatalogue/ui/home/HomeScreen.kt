@@ -1,0 +1,298 @@
+package com.example.starccatalogue.ui.home
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+
+// wird in MainActivity verwendet
+// in ComposobleRoute als Funktion die aufgerufen wird fürs darstellen
+@Composable
+fun HomeScreen(
+    /* TODO: ViewModel Parameter einfügen */
+) {
+    /* TODO: Daten für Screen aus ViewModel holen*/
+    HomeScreen(
+        onProfileClick = { /* TODO */ },
+        onEventClick = { /* TODO */ }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeScreen(
+    onProfileClick: () -> Unit,
+    onEventClick: (EventRow) -> Unit,
+) {
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            SearchBar()
+            Spacer(Modifier.height(16.dp))
+            TopStarCard(onProfileClick = onProfileClick)
+            Spacer(Modifier.height(16.dp))
+            BlogSection()
+            Spacer(Modifier.height(16.dp))
+            EventsList(onEventClick = onEventClick)
+        }
+    }
+}
+
+@Composable
+private fun SearchBar(
+    modifier: Modifier = Modifier,
+    placeholder: String = "Sterne"
+) {
+    var value by remember { mutableStateOf("") }
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(52.dp),
+        color = Color(0xFFE6EAF1),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { /* TODO: handle menu */ }) {
+                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menü")
+            }
+            BasicTextField(
+                value = value,
+                onValueChange = { value = it },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodyMedium
+            ) { innerTextField ->
+                if (value.isEmpty()) {
+                    Text(
+                        text = placeholder,
+                        style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+                    )
+                }
+                innerTextField()
+            }
+            IconButton(onClick = { /* TODO: handle search */ }) {
+                Icon(imageVector = Icons.Filled.Search, contentDescription = "Suche")
+            }
+        }
+    }
+}
+
+@Composable
+private fun TopStarCard(onProfileClick: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(96.dp)
+                    .background(Color(0xFFE6EAF1), RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = null,
+                    tint = Color(0xFF7970FF),
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Heutiger Top Stern",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Start
+                )
+                Text(
+                    text = "so schön ja",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Start
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(onClick = onProfileClick) {
+                        Text("zum Profil")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BlogSection() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text("15.07.2024", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+            Text("Aktuelle Beobachtungen", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color(0xFF545454)
+            )
+            Text(
+                "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color(0xFF545454)
+            )
+        }
+    }
+}
+
+private data class EventRow(val title: String, val subtitle: String, val time: String)
+
+@Composable
+private fun EventsList(onEventClick: (EventRow) -> Unit) {
+    val items = listOf(
+        EventRow("Sonnenfinterisnis", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Taggesamtzeit - 10:00"),
+        EventRow("Mars und Saturn stehen im Zwiespalt", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Stundenhalbzeit - 10:30"),
+        EventRow("Plute wird wieder Planet", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Normalzeit - 13:37")
+    )
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text("Nächste Himmelsevent", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 8.dp))
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            items(items) { event ->
+                EventCard(event, onClick = { onEventClick(event) })
+            }
+        }
+    }
+}
+
+@Composable
+private fun EventCard(event: EventRow, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(Color(0xFFE6EAF1), RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(imageVector = Icons.Filled.Star, contentDescription = null, tint = Color(0xFF9AA0A6))
+            }
+            Column(
+                modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(event.title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                Text(event.subtitle, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                Text(event.time, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+            }
+            Icon(imageVector = Icons.Filled.ChevronRight, contentDescription = null, tint = Color.Gray)
+        }
+    }
+}
+
+@Preview(showBackground = true, heightDp = 800)
+@Composable
+private fun HomeScreenPreview() {
+    MaterialTheme {
+        HomeScreen(
+            onProfileClick = {},
+            onEventClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SearchBarPreview() {
+    MaterialTheme {
+        Box(modifier = Modifier.background(Color.White)) {
+            SearchBar(modifier = Modifier.padding(16.dp))
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TopStarCardPreview() {
+    MaterialTheme { TopStarCard(onProfileClick = {}) }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BlogSectionPreview() {
+    MaterialTheme { BlogSection() }
+}
+
+@Preview(showBackground = true, heightDp = 420)
+@Composable
+private fun EventsListPreview() {
+    MaterialTheme { EventsList(onEventClick = {}) }
+}
