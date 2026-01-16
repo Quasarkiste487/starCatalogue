@@ -67,10 +67,10 @@ class ExampleUnitTest {
     @Test
     fun fetchDataRepo(){
         val repo : StarDataSource = SimbadSQLSource(simbad = Simbad())
-        val list = repo.ListStars(10)
+        val list = repo.listStars(10)
         list.forEach { println(it) }
 
-        val first = repo.GetStarDetails(list[0].oid)
+        val first = repo.getStarDetails(list[0].oid)
         println("Sirius: ")
         println(first)
     }
