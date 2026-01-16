@@ -9,6 +9,7 @@ data class StarOverview(val oid : Int, val name : String, val typ : String)
 data class StarDetails(
     val oid : Int,
     val name : String,
+    val scientificName : String,
     val ra : Float,
     val dec : Float,
     val mag : Float,
@@ -268,23 +269,59 @@ class SimbadSQLSource(val simbad: Simbad) : StarDataSource{
         JOIN ident on oid = oidref
         LEFT JOIN allfluxes using(oidref)
         LEFT JOIN otypedef using(otype)
-        where oid = $oid and id like 'NAME%'
+        where oid = $oid
         """.trimIndent()
 
         val table = simbad.fetchData(query)?.buildStarTable() ?: return null
-        val row = table.getRow(0)
+
+        val rowSequence = table.rowSequence
+        if (!rowSequence.next()) {
+            rowSequence.close()
+            return null
+        }
+
+        var commonName: String? = null
+        var scientificName: String? = null
+        // Capture first row for other data (coordinates etc are same for all rows of same star)
+        val firstRow = rowSequence.row
+
+        // Process first row
+        val firstId = firstRow[1].toString()
+        if (firstId.startsWith("NAME ")) {
+            commonName = firstId.substring(5)
+        } else {
+            scientificName = firstId
+        }
+
+        // Process remaining rows if any
+        while (rowSequence.next()) {
+             val row = rowSequence.row
+             val id = row[1].toString()
+             if (id.startsWith("NAME ") && commonName == null) {
+                 commonName = id.substring(5)
+             } else if (!id.startsWith("NAME ") && scientificName == null) {
+                 scientificName = id
+             }
+             if (commonName != null && scientificName != null) break
+        }
+        rowSequence.close()
+
+        val finalCommonName = commonName ?: scientificName ?: "Unknown"
+        val finalScientificName = scientificName ?: finalCommonName
+
         try {
             return StarDetails(
-                row[0].toString().toInt(),
-                row[1].toString().substring(5),
-                row[2].toString().toFloat(),
-                row[3].toString().toFloat(),
-                row[4].toString().toFloat(),
-                row[5].toString(),
-                row[6].toString(),
+                oid = firstRow[0].toString().toInt(),
+                name = finalCommonName,
+                scientificName = finalScientificName,
+                ra = firstRow[2].toString().toFloat(),
+                dec = firstRow[3].toString().toFloat(),
+                mag = firstRow[4].toString().toFloat(),
+                shortType = firstRow[5].toString(),
+                type = firstRow[6].toString(),
             )
         }catch(_: Exception){
-            println("Invalid table row: $row")
+            println("Invalid table row: ${firstRow.contentToString()}")
             return null
         }
     }

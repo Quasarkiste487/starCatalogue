@@ -78,4 +78,5 @@ dependencies {
     ksp(libs.moshi.annotationProcessor)
 
     implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.coil.compose)
 }

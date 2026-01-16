@@ -23,6 +23,9 @@ kotlinxSerialization = "1.9.0" # For Navigation Route serialization
 # Dependency Injection
 koin = "4.1.1"
 
+# Image Loading
+coil = "2.6.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -58,6 +61,9 @@ koin-compose = { group = "io.insert-koin", name = "koin-compose-viewmodel", vers
 
 # Icons
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "compose-icons" }
+
+# Coil
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
