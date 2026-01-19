@@ -1,5 +1,6 @@
 package com.example.starccatalogue
 
+import com.example.starccatalogue.network.Filter
 import com.example.starccatalogue.network.QueryScript
 import com.example.starccatalogue.network.Simbad
 import com.example.starccatalogue.network.SimbadResponse
@@ -66,11 +67,14 @@ class ExampleUnitTest {
 
     @Test
     fun fetchDataRepo(){
-        val repo : StarDataSource = SimbadSQLSource(simbad = Simbad())
-        val list = repo.listStars(10, "Sirius")
-        list.forEach { println(it) }
+        val repo = SimbadSQLSource(Simbad())
+        val result = repo.listStarsRequest()
+            .limit(10)
+            .filter("ident", Filter.like("id", "NAME %Sirius%"))
+            .fetch()
+        result.forEach { println(it) }
 
-        val first = repo.getStarDetails(list[0].oid)
+        val first = repo.getStarDetails(result[0].oid)
         println("Sirius: ")
         println(first)
     }

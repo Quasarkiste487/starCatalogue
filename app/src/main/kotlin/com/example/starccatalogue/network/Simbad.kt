@@ -51,7 +51,7 @@ class Simbad (private val mirrorUrl : String = DEFAULT_MIRROR){
     fun fetchData(sqlQuery: String): SimbadResponse? {
         val requestUrl = "$mirrorUrl/sim-tap/sync?request=doQuery&lang=adql&format=votable&query=" + URLEncoder.encode(sqlQuery,
             StandardCharsets.UTF_8)
-        println("URL: $requestUrl")
+        // println("URL: $requestUrl")
 
         return fetchData(URL(requestUrl))
     }
