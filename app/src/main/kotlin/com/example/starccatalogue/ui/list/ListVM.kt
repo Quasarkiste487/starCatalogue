@@ -25,6 +25,10 @@ class ListVM(
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
     private val _stars: MutableStateFlow<List<StarOverview>> = MutableStateFlow(emptyList())
     val stars: StateFlow<List<StarOverview>> = _stars.asStateFlow()
+    private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    private val _error: MutableStateFlow<String?> = MutableStateFlow(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
 
     init {
         loadData(starName)
@@ -40,10 +44,18 @@ class ListVM(
 
     private fun loadData(query: String) {
         viewModelScope.launch(Dispatchers.IO){
-            val repo : StarDataSource = SimbadSQLSource(simbad = Simbad())
-            val starList = repo.listStars(10, query)
-            _stars.update {
-                starList
+            _isLoading.update { true }
+            _error.update { null }
+            try {
+                val repo : StarDataSource = SimbadSQLSource(simbad = Simbad())
+                val starList = repo.listStars(10, query)
+                _stars.update {
+                    starList
+                }
+            } catch (e: Exception) {
+                _error.update { e.message ?: "Ein Fehler ist aufgetreten" }
+            } finally {
+                _isLoading.update { false }
             }
         }
     }
