@@ -247,3 +247,39 @@ private fun ListScreenPreview() {
         )
     }
 }
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ListScreenLoadingPreview() {
+    StarcCatalogueTheme {
+        ListS(
+            stars = emptyList(),
+            searchQuery = "Sirius",
+            isLoading = true,
+            error = null,
+            onUpClick = {},
+            onStarClick = {},
+            onSearchQueryChange = {},
+            onSearch = {},
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ListScreenErrorPreview() {
+    StarcCatalogueTheme {
+        ListS(
+            stars = emptyList(),
+            searchQuery = "Sirius",
+            isLoading = false,
+            error = "Netzwerkverbindung fehlgeschlagen. Bitte überprüfen Sie Ihre Internetverbindung.",
+            onUpClick = {},
+            onStarClick = {},
+            onSearchQueryChange = {},
+            onSearch = {},
+        )
+    }
+}
