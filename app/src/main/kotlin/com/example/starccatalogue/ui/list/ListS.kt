@@ -136,11 +136,31 @@ private fun ListS(
                         )
                     }
                 }
+                stars.isEmpty() -> {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Keine Sterne gefunden",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Versuchen Sie eine andere Suche",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
                 else -> {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 16.dp),
+                        contentPadding = innerPadding,
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(stars) { star ->
@@ -278,6 +298,24 @@ private fun ListScreenErrorPreview() {
             searchQuery = "Sirius",
             isLoading = false,
             error = "Netzwerkverbindung fehlgeschlagen. Bitte überprüfen Sie Ihre Internetverbindung.",
+            onUpClick = {},
+            onStarClick = {},
+            onSearchQueryChange = {},
+            onSearch = {},
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ListScreenEmptyPreview() {
+    StarcCatalogueTheme {
+        ListS(
+            stars = emptyList(),
+            searchQuery = "NonExistentStar",
+            isLoading = false,
+            error = null,
             onUpClick = {},
             onStarClick = {},
             onSearchQueryChange = {},
