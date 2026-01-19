@@ -2,11 +2,13 @@ package com.example.starccatalogue.ui.list
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,6 +23,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,9 +53,13 @@ fun ListS (
 ) {
     val stars by viewModel.stars.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
     ListS(
         stars = stars,
         searchQuery = searchQuery,
+        isLoading = isLoading,
+        error = error,
         onUpClick = onUpClick,
         onStarClick = onStarClick,
         onSearchQueryChange = viewModel::updateSearchQuery,
@@ -66,6 +73,8 @@ fun ListS (
 private fun ListS(
     stars: List<StarOverview>,
     searchQuery: String,
+    isLoading: Boolean,
+    error: String?,
     onUpClick: () -> Unit,
     onStarClick: (Int) -> Unit,
     onSearchQueryChange: (String) -> Unit,
@@ -94,14 +103,67 @@ private fun ListS(
         )
     },
     ) { innerPadding ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            contentPadding = innerPadding,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(innerPadding),
+            contentAlignment = Alignment.Center
         ) {
-            items(stars) { star ->
+            when {
+                isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(48.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        contentDescription = "Daten werden geladen"
+                    )
+                }
+                error != null -> {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Fehler",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = error,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+                stars.isEmpty() -> {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Keine Sterne gefunden",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Versuchen Sie eine andere Suche",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        contentPadding = innerPadding,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(stars) { star ->
                 Card(
                     onClick = { onStarClick(star.oid) },
                     modifier = Modifier.fillMaxWidth(),
@@ -160,6 +222,8 @@ private fun ListS(
                     }
                 }
             }
+                }
+            }
         }
     }
 }
@@ -196,6 +260,62 @@ private fun ListScreenPreview() {
                 StarOverview(3, "Arcturus", "Giant"),
             ),
             searchQuery = "Sirius",
+            isLoading = false,
+            error = null,
+            onUpClick = {},
+            onStarClick = {},
+            onSearchQueryChange = {},
+            onSearch = {},
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ListScreenLoadingPreview() {
+    StarcCatalogueTheme {
+        ListS(
+            stars = emptyList(),
+            searchQuery = "Sirius",
+            isLoading = true,
+            error = null,
+            onUpClick = {},
+            onStarClick = {},
+            onSearchQueryChange = {},
+            onSearch = {},
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ListScreenErrorPreview() {
+    StarcCatalogueTheme {
+        ListS(
+            stars = emptyList(),
+            searchQuery = "Sirius",
+            isLoading = false,
+            error = "Netzwerkverbindung fehlgeschlagen. Bitte überprüfen Sie Ihre Internetverbindung.",
+            onUpClick = {},
+            onStarClick = {},
+            onSearchQueryChange = {},
+            onSearch = {},
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ListScreenEmptyPreview() {
+    StarcCatalogueTheme {
+        ListS(
+            stars = emptyList(),
+            searchQuery = "NonExistentStar",
+            isLoading = false,
+            error = null,
             onUpClick = {},
             onStarClick = {},
             onSearchQueryChange = {},

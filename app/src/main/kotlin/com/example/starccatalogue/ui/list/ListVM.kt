@@ -25,6 +25,12 @@ class ListVM(
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
     private val _stars: MutableStateFlow<List<StarOverview>> = MutableStateFlow(emptyList())
     val stars: StateFlow<List<StarOverview>> = _stars.asStateFlow()
+    private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    private val _error: MutableStateFlow<String?> = MutableStateFlow(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
+    
+    private val repo: StarDataSource = SimbadSQLSource(simbad = Simbad())
 
     init {
         loadData(starName)
@@ -40,10 +46,26 @@ class ListVM(
 
     private fun loadData(query: String) {
         viewModelScope.launch(Dispatchers.IO){
-            val repo : StarDataSource = SimbadSQLSource(simbad = Simbad())
-            val starList = repo.listStars(10, query)
-            _stars.update {
-                starList
+            _isLoading.update { true }
+            _error.update { null }
+            _stars.update { emptyList() }
+            try {
+                val starList = repo.listStars(10, query)
+                _stars.update {
+                    starList
+                }
+            } catch (e: Exception) {
+                val errorMessage = when {
+                    e.message?.contains("UnknownHost", ignoreCase = true) == true ||
+                    e.message?.contains("Network", ignoreCase = true) == true -> 
+                        "Netzwerkverbindung fehlgeschlagen. Bitte überprüfen Sie Ihre Internetverbindung."
+                    e.message?.contains("timeout", ignoreCase = true) == true -> 
+                        "Zeitüberschreitung. Bitte versuchen Sie es erneut."
+                    else -> e.message ?: "Ein Fehler ist aufgetreten"
+                }
+                _error.update { errorMessage }
+            } finally {
+                _isLoading.update { false }
             }
         }
     }
