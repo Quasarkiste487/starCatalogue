@@ -41,12 +41,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.starccatalogue.network.StarOverview
 import com.example.starccatalogue.ui.theme.StarcCatalogueTheme
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ListS (
     onStarClick: (Int) -> Unit,
     onUpClick: () -> Unit,
-    viewModel: ListVM = viewModel(),
+    viewModel: ListVM = koinViewModel(),
 ) {
     val stars by viewModel.stars.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()

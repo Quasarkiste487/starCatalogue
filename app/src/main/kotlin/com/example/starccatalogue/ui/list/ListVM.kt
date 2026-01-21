@@ -18,7 +18,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ListVM(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val starSource: StarDataSource
 ): ViewModel() {
     private val starName: String = savedStateHandle
         .toRoute<ListR>()
@@ -42,8 +43,7 @@ class ListVM(
 
     private fun loadData(query: String) {
         viewModelScope.launch(Dispatchers.IO){
-            val repo : StarDataSource = SimbadSQLSource(simbad = Simbad(logger = com.example.starccatalogue.util.AndroidLogger()))
-            val starList = repo.listStarsRequest()
+            val starList = starSource.listStarsRequest()
                 .limit(10)
                 .filter("ident", Filter.like("id", "NAME %$query%"))
                 .order(Ordering("allfluxes", "V"))

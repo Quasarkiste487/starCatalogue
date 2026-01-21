@@ -5,7 +5,6 @@ import com.example.starccatalogue.network.QueryScript
 import com.example.starccatalogue.network.Simbad
 import com.example.starccatalogue.network.SimbadResponse
 import com.example.starccatalogue.network.SimbadSQLSource
-import com.example.starccatalogue.network.StarDataSource
 import com.example.starccatalogue.network.printAll
 import org.junit.Test
 import uk.ac.starlink.table.StarTable
