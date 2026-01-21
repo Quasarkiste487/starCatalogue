@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.example.starccatalogue.network.Filter
+import com.example.starccatalogue.network.Ordering
 import com.example.starccatalogue.network.Simbad
 import com.example.starccatalogue.network.SimbadSQLSource
 import com.example.starccatalogue.network.StarDataSource
@@ -41,7 +43,11 @@ class ListVM(
     private fun loadData(query: String) {
         viewModelScope.launch(Dispatchers.IO){
             val repo : StarDataSource = SimbadSQLSource(simbad = Simbad())
-            val starList = repo.listStars(10, query)
+            val starList = repo.listStarsRequest()
+                .limit(10)
+                .filter("ident", Filter.like("id", "NAME %$query%"))
+                .order(Ordering("allfluxes", "V"))
+                .fetch()
             _stars.update {
                 starList
             }

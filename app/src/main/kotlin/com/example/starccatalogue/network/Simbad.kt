@@ -2,6 +2,7 @@ package com.example.starccatalogue.network
 
 import android.net.http.NetworkException
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresExtension
 import okhttp3.internal.connection.Exchange
@@ -30,6 +31,7 @@ class Simbad (private val mirrorUrl : String = DEFAULT_MIRROR){
      * @return A SimbadResponse containing the response stream
      */
     fun fetchData(url: URL) : SimbadResponse?{
+        Log.i("Simbad", "Fetching data from URL: $url")
         try{
             val responseStream = url.openConnection().getInputStream()
             return SimbadResponse(responseStream = responseStream)
@@ -51,7 +53,7 @@ class Simbad (private val mirrorUrl : String = DEFAULT_MIRROR){
     fun fetchData(sqlQuery: String): SimbadResponse? {
         val requestUrl = "$mirrorUrl/sim-tap/sync?request=doQuery&lang=adql&format=votable&query=" + URLEncoder.encode(sqlQuery,
             StandardCharsets.UTF_8)
-        println("URL: $requestUrl")
+        // println("URL: $requestUrl")
 
         return fetchData(URL(requestUrl))
     }
@@ -76,7 +78,7 @@ class SimbadResponse(val responseStream : InputStream){
             if (line.startsWith("::")){
                 // New section detected; save the previous section if it exists
                 if (currentSectionName != null){
-                    println("Read $currentSectionName with ${sectionContentBuffer.length} chars")
+                    Log.i("Simbad","Read $currentSectionName with ${sectionContentBuffer.length} chars")
                     headerMetadata[currentSectionName] = sectionContentBuffer.toString()
                 }
                 // Extract section name (between "::" and ":")
