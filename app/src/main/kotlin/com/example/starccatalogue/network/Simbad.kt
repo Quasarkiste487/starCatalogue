@@ -5,6 +5,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresExtension
+import com.example.starccatalogue.util.Logger
 import okhttp3.internal.connection.Exchange
 import uk.ac.starlink.table.StarTable
 import uk.ac.starlink.table.StarTableFactory
@@ -19,7 +20,7 @@ import java.nio.charset.StandardCharsets
  * Client for fetching astronomical data from the SIMBAD database.
  * Supports configurable mirror URLs for redundancy.
  */
-class Simbad (private val mirrorUrl : String = DEFAULT_MIRROR){
+class Simbad (val logger : Logger, private val mirrorUrl : String = DEFAULT_MIRROR){
     companion object{
         // Default SIMBAD mirror URL (France)
         const val DEFAULT_MIRROR = "https://simbad.cds.unistra.fr/simbad"
@@ -31,10 +32,10 @@ class Simbad (private val mirrorUrl : String = DEFAULT_MIRROR){
      * @return A SimbadResponse containing the response stream
      */
     fun fetchData(url: URL) : SimbadResponse?{
-        Log.i("Simbad", "Fetching data from URL: $url")
+        logger.i("Simbad", "Fetching data from URL: $url")
         try{
             val responseStream = url.openConnection().getInputStream()
-            return SimbadResponse(responseStream = responseStream)
+            return SimbadResponse(logger, responseStream = responseStream)
         }catch(e : Exception) {
             print("Exception occured while fetching data: $e")
         }
@@ -63,7 +64,7 @@ class Simbad (private val mirrorUrl : String = DEFAULT_MIRROR){
  * Represents the raw response from a SIMBAD query.
  * Parses header information from the response and provides access to the underlying table data.
  */
-class SimbadResponse(val responseStream : InputStream){
+class SimbadResponse(val logger : Logger, val responseStream : InputStream){
     // Stores metadata sections from the response (e.g., warnings, info)
     private var headerMetadata = HashMap<String, String>()
 
@@ -78,7 +79,7 @@ class SimbadResponse(val responseStream : InputStream){
             if (line.startsWith("::")){
                 // New section detected; save the previous section if it exists
                 if (currentSectionName != null){
-                    Log.i("Simbad","Read $currentSectionName with ${sectionContentBuffer.length} chars")
+                    logger.i("Simbad","Read $currentSectionName with ${sectionContentBuffer.length} chars")
                     headerMetadata[currentSectionName] = sectionContentBuffer.toString()
                 }
                 // Extract section name (between "::" and ":")

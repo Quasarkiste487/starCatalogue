@@ -48,13 +48,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.compose.viewmodel.koinViewModel
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun StarsScreen(
-    starId: Int,
     onNavigateBack: () -> Unit,
-    viewModel: StarsViewModel = StarsViewModel(starId),
+    viewModel: StarsViewModel = koinViewModel(),
 ) {
     val starState by viewModel.starState.collectAsStateWithLifecycle()
     StarsScreen(
