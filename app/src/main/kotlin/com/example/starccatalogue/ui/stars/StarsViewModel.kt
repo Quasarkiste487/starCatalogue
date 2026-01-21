@@ -35,7 +35,8 @@ class StarsViewModel(private val starId: Int): ViewModel(){
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun loadData() {
         viewModelScope.launch(Dispatchers.IO) {
-            val repo : StarDataSource = SimbadSQLSource(simbad = Simbad())
+            val logger = com.example.starccatalogue.util.AndroidLogger()
+            val repo : StarDataSource = SimbadSQLSource(simbad = Simbad(logger))
             val star = repo.getStarDetails(starId)
 
             _starState.update {

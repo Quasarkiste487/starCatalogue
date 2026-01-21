@@ -42,7 +42,7 @@ class ListVM(
 
     private fun loadData(query: String) {
         viewModelScope.launch(Dispatchers.IO){
-            val repo : StarDataSource = SimbadSQLSource(simbad = Simbad())
+            val repo : StarDataSource = SimbadSQLSource(simbad = Simbad(logger = com.example.starccatalogue.util.AndroidLogger()))
             val starList = repo.listStarsRequest()
                 .limit(10)
                 .filter("ident", Filter.like("id", "NAME %$query%"))

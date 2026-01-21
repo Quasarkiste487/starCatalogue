@@ -22,10 +22,12 @@ class ExampleUnitTest {
 
     @Test
     fun fetchStardataScript() {
+        val logger = com.example.starccatalogue.util.StdoutLogger()
+
         val script = QueryScript(10, listOf("main_id", "ra", "dec", "flux(V)"), "Vmag < 6")
         var raw : SimbadResponse?
         println("fetched data in: " + measureTime {
-            raw = Simbad().fetchData(script)
+            raw = Simbad(logger).fetchData(script)
         })
 
         if (raw == null){
@@ -49,9 +51,11 @@ class ExampleUnitTest {
         order by V
         """.trimIndent()
 
+        val logger = com.example.starccatalogue.util.StdoutLogger()
+
         var raw : SimbadResponse?
         println("fetched data in: " + measureTime {
-            raw = Simbad().fetchData(query)
+            raw = Simbad(logger).fetchData(query)
         })
         if (raw == null){
             return
@@ -67,7 +71,9 @@ class ExampleUnitTest {
 
     @Test
     fun fetchDataRepo(){
-        val repo = SimbadSQLSource(Simbad())
+        val logger = com.example.starccatalogue.util.StdoutLogger()
+
+        val repo = SimbadSQLSource(Simbad(logger))
         val result = repo.listStarsRequest()
             .limit(10)
             .filter("ident", Filter.like("id", "NAME %Sirius%"))
