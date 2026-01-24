@@ -24,6 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Explore
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material3.Card
@@ -74,7 +75,7 @@ private fun StarsScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text(starState.id.ifEmpty { "Stern xy" }) },
+                title = { Text(starState.name.ifEmpty { "Stern Details" }) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -156,21 +157,12 @@ private fun HeroSection(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = starState.id.ifEmpty { "Stern" },
+                    text = starState.name.ifEmpty { "Stern" },
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     textAlign = TextAlign.Center
                 )
-                if (starState.magnitude.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Magnitude ${starState.magnitude}",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Color(0xFFE1BEE7), // Light purple
-                        textAlign = TextAlign.Center
-                    )
-                }
             }
         }
     }
@@ -194,11 +186,11 @@ private fun DataCardsSection(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        // ID Card
-        if (starState.id.isNotEmpty()) {
+        // Scientific Identifier Card
+        if (starState.scientificId.isNotEmpty()) {
             DataCard(
-                label = "Identifier",
-                value = starState.id,
+                label = "Scientific Name",
+                value = starState.scientificId,
                 icon = Icons.Outlined.LightMode
             )
         }
@@ -232,6 +224,24 @@ private fun DataCardsSection(
                 label = "Declination",
                 value = starState.dec,
                 icon = Icons.Outlined.Explore
+            )
+        }
+
+        // Distance Card
+        if (starState.distanceLightYears.isNotEmpty()) {
+             DataCard(
+                label = "Distanz",
+                value = starState.distanceLightYears,
+                icon = Icons.Outlined.Explore // Or appropriate icon
+            )
+        }
+
+        // Spectral Class Card
+        if (starState.spectralClass.isNotEmpty()) {
+             DataCard(
+                label = "Spektralklasse",
+                value = starState.spectralClass,
+                icon = Icons.Outlined.Info
             )
         }
     }
@@ -293,10 +303,13 @@ private fun DataCard(
 private fun StarsScreenPreview() {
     StarsScreen(
         starState = StarUiState(
-            id = "Sirius",
-            magnitude = "-1.46",
-            ra = "101.287155",
-            dec = "-16.716116",
+            name = "Sirius",
+            scientificId = "HIP 32349",
+            magnitude = "-1.4600",
+            ra = "101.2872",
+            dec = "-16.7161",
+            spectralClass = "A0m...",
+            distanceLightYears = "8.60 ly",
             isLoading = false
         ),
         onNavigateBack = {}
@@ -308,13 +321,8 @@ private fun StarsScreenPreview() {
 private fun StarsScreenLoadingPreview() {
     StarsScreen(
         starState = StarUiState(
-            id = "",
-            magnitude = "",
-            ra = "",
-            dec = "",
             isLoading = true
         ),
         onNavigateBack = {}
     )
 }
-

@@ -1,19 +1,22 @@
 package com.example.starccatalogue.ui.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Menu
@@ -21,9 +24,11 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,48 +43,74 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
-// wird in MainActivity verwendet
-// in ComposobleRoute als Funktion die aufgerufen wird fürs darstellen
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     onProfileClick: (String) -> Unit,
-    onSearchClick: (String) -> Unit
+    onSearch: (String) -> Unit,
+    onOpenDrawer: () -> Unit, // Added missing parameter
+    viewModel: HomeViewModel = viewModel()
 ) {
-    /* TODO: Daten für Screen aus ViewModel holen*/
-    val todaysStarId = "Betelgeuse"
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     HomeScreen(
-        onProfileClick = { onProfileClick(todaysStarId) },
-        onEventClick = { /* TODO */ },
-        onSearchClick = onSearchClick
+        uiState = uiState,
+        onProfileClick = onProfileClick,
+        onEventClick = { /* TODO: navigation to event details */ },
+        onSearchClick = onSearch,
+        onOpenDrawer = onOpenDrawer
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
-    onProfileClick: () -> Unit,
+    uiState: HomeUiState,
+    onProfileClick: (String) -> Unit,
     onEventClick: (EventRow) -> Unit,
-    onSearchClick: (String) -> Unit
+    onSearchClick: (String) -> Unit,
+    onOpenDrawer: () -> Unit
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        Column(
+        // Use LazyColumn as the specific scrolling container
+        LazyColumn(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize()
-                .padding(16.dp)
+                .fillMaxSize(),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SearchBar(onSearch = onSearchClick)
-            Spacer(Modifier.height(16.dp))
-            TopStarCard(onProfileClick = onProfileClick)
-            Spacer(Modifier.height(16.dp))
-            BlogSection()
-            Spacer(Modifier.height(16.dp))
-            EventsList(onEventClick = onEventClick)
+            item {
+                SearchBar(onSearch = onSearchClick, onMenuClick = onOpenDrawer)
+            }
+
+            item {
+                uiState.topStar?.let {
+                    TopStarCard(topStar = it, onProfileClick = onProfileClick)
+                }
+            }
+
+            item {
+                uiState.blogArticle?.let {
+                    BlogSection(article = it)
+                }
+            }
+
+            item {
+                Text(
+                    "Nächste Himmelsevent",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
+
+            items(uiState.events) { event ->
+                EventCard(event, onClick = { onEventClick(event) })
+            }
         }
     }
 }
@@ -88,7 +119,8 @@ private fun HomeScreen(
 private fun SearchBar(
     modifier: Modifier = Modifier,
     placeholder: String = "Sterne",
-    onSearch: (String) -> Unit
+    onSearch: (String) -> Unit,
+    onMenuClick: () -> Unit
 ) {
     var value by remember { mutableStateOf("") }
     Surface(
@@ -104,7 +136,7 @@ private fun SearchBar(
                 .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { /* TODO: handle menu */ }) {
+            IconButton(onClick = onMenuClick) {
                 Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menü")
             }
             BasicTextField(
@@ -132,7 +164,7 @@ private fun SearchBar(
 }
 
 @Composable
-private fun TopStarCard(onProfileClick: () -> Unit) {
+private fun TopStarCard(topStar: TopStar, onProfileClick: (String) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp)
@@ -161,13 +193,19 @@ private fun TopStarCard(onProfileClick: () -> Unit) {
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = "Heutiger Top Stern",
+                    text = topStar.name, // Use data from model
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Start
                 )
                 Text(
-                    text = "so schön ja",
+                    text = "Heutiger Top Stern",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Start
+                )
+                Text(
+                    text = topStar.description,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray,
                     textAlign = TextAlign.Start
@@ -176,7 +214,7 @@ private fun TopStarCard(onProfileClick: () -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Button(onClick = onProfileClick) {
+                    Button(onClick = { onProfileClick(topStar.id) }) {
                         Text("zum Profil")
                     }
                 }
@@ -186,7 +224,7 @@ private fun TopStarCard(onProfileClick: () -> Unit) {
 }
 
 @Composable
-private fun BlogSection() {
+private fun BlogSection(article: BlogArticle) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp)
@@ -195,36 +233,14 @@ private fun BlogSection() {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("15.07.2024", style = MaterialTheme.typography.labelMedium, color = Color.Gray)
-            Text("Aktuelle Beobachtungen", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF545454)
-            )
-            Text(
-                "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF545454)
-            )
-        }
-    }
-}
-
-private data class EventRow(val title: String, val subtitle: String, val time: String)
-
-@Composable
-private fun EventsList(onEventClick: (EventRow) -> Unit) {
-    val items = listOf(
-        EventRow("Sonnenfinterisnis", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Taggesamtzeit - 10:00"),
-        EventRow("Mars und Saturn stehen im Zwiespalt", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Stundenhalbzeit - 10:30"),
-        EventRow("Plute wird wieder Planet", "Description duis aute irure dolor in reprehenderit in voluptate velit.", "Normalzeit - 13:37")
-    )
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text("Nächste Himmelsevent", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 8.dp))
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(items) { event ->
-                EventCard(event, onClick = { onEventClick(event) })
+            Text(article.date, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+            Text(article.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            article.paragraphs.forEach { paragraph ->
+                Text(
+                    paragraph,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF545454)
+                )
             }
         }
     }
@@ -263,41 +279,24 @@ private fun EventCard(event: EventRow, onClick: () -> Unit) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true, heightDp = 800)
 @Composable
 private fun HomeScreenPreview() {
     MaterialTheme {
         HomeScreen(
+            uiState = HomeUiState(
+                topStar = TopStar("Sirius", "Sirius", "Brightest star"),
+                blogArticle = BlogArticle("01.01.2023", "Title", listOf("Content")),
+                events = listOf(
+                    EventRow("Event 1", "Sub 1", "Time 1"),
+                    EventRow("Event 2", "Sub 2", "Time 2")
+                )
+            ),
             onProfileClick = {},
-            onEventClick = {}
+            onEventClick = {},
+            onSearchClick = {},
+            onOpenDrawer = {}
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SearchBarPreview() {
-    MaterialTheme {
-        Box(modifier = Modifier.background(Color.White)) {
-            SearchBar(modifier = Modifier.padding(16.dp))
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TopStarCardPreview() {
-    MaterialTheme { TopStarCard(onProfileClick = {}) }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun BlogSectionPreview() {
-    MaterialTheme { BlogSection() }
-}
-
-@Preview(showBackground = true, heightDp = 420)
-@Composable
-private fun EventsListPreview() {
-    MaterialTheme { EventsList(onEventClick = {}) }
 }

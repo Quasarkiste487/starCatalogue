@@ -52,9 +52,10 @@ class MainActivity : ComponentActivity() {
                             onProfileClick = { starId ->
                                 navController.navigate(StarsRoute(starId = starId))
                             },
-                            onSearchClick = { query ->
+                            onSearch = { query ->
                                 navController.navigate(ListRoute(searchQuery = query))
-                            }
+                            },
+                            onOpenDrawer = {}
                         )
                     }
                     composable<StarsRoute> { backStackEntry ->
