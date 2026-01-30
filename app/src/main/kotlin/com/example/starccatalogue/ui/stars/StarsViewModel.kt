@@ -1,13 +1,9 @@
 package com.example.starccatalogue.ui.stars
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.starccatalogue.network.Simbad
-import com.example.starccatalogue.network.SimbadSQLSource
 import com.example.starccatalogue.network.StarDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +24,7 @@ data class StarUiState(
 class StarsViewModel(
     private val starSource: StarDataSource,
     savedStateHandle: SavedStateHandle,
-): ViewModel(){
+) : ViewModel() {
 
     private val starId: Int = savedStateHandle.toRoute<StarsRoute>().starId
     private val _starState: MutableStateFlow<StarUiState> = MutableStateFlow(StarUiState())
@@ -42,15 +38,15 @@ class StarsViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val star = starSource.getStarDetails(starId)
             _starState.update {
-                if(star != null) {
-                        StarUiState(
-                            id = star.oid,
-                            magnitude = star.mag,
-                            ra = star.ra,
-                            dec = star.dec,
-                            isLoading = false,
-                            name = star.name,
-                        )
+                if (star != null) {
+                    StarUiState(
+                        id = star.oid,
+                        magnitude = star.mag,
+                        ra = star.ra,
+                        dec = star.dec,
+                        isLoading = false,
+                        name = star.name,
+                    )
                 } else {
                     StarUiState(id = starId, isLoading = false)
                 }
