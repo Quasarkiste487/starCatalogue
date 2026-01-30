@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.MyLocation
@@ -59,6 +60,7 @@ fun StarsScreen(
     StarsScreen(
         starState = starState,
         onNavigateBack = onNavigateBack,
+        onToggleBookmark = viewModel::toggleBookmark,
     )
 }
 
@@ -67,6 +69,7 @@ fun StarsScreen(
 private fun StarsScreen(
     starState: StarUiState,
     onNavigateBack: () -> Unit,
+    onToggleBookmark: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -82,10 +85,10 @@ private fun StarsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: Bookmark-Funktion */ }) {
+                    IconButton(onClick = onToggleBookmark) {
                         Icon(
-                            imageVector = Icons.Outlined.BookmarkBorder,
-                            contentDescription = "Merken"
+                            imageVector = if (starState.isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                            contentDescription = if (starState.isBookmarked) "Bookmark entfernen" else "Bookmark hinzufügen"
                         )
                     }
                 },
@@ -285,8 +288,10 @@ private fun StarsScreenPreview() {
             magnitude = -1.46f,
             ra = 101.287155f,
             dec = -16.716116f,
-            isLoading = false
+            isLoading = false,
+            isBookmarked = false
         ),
-        onNavigateBack = {}
+        onNavigateBack = {},
+        onToggleBookmark = {}
     )
 }

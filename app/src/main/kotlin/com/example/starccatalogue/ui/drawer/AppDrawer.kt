@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun AppDrawer(
-    appName: String, onHomeClick: () -> Unit, onStarListClick: () -> Unit
+    appName: String, onHomeClick: () -> Unit, onStarListClick: () -> Unit, onBookmarkClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -70,6 +70,15 @@ internal fun AppDrawer(
             )
         )
 
+        NavigationDrawerItem(
+            label = { Text("Lesezeichen") },
+            selected = false,
+            onClick = onBookmarkClick,
+            modifier = Modifier.padding(horizontal = 12.dp),
+            colors = NavigationDrawerItemDefaults.colors(
+                selectedContainerColor = Color(0xFFE6EAF1)
+            )
+        )
         Spacer(modifier = Modifier.weight(1f))
 
         Column(
