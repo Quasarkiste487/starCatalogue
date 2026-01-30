@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.starccatalogue.ui.bookmark.BookmarkRoute
+import com.example.starccatalogue.ui.bookmark.BookmarkScreen
 import com.example.starccatalogue.ui.drawer.AppDrawer
 import com.example.starccatalogue.ui.home.HomeRoute
 import com.example.starccatalogue.ui.home.HomeScreen
@@ -52,6 +54,10 @@ fun AppRoot() {
                     navController.navigate(ListR)
                     scope.launch { drawerState.close() }
                 },
+                onBookmarkClick = {
+                    navController.navigate(BookmarkRoute)
+                    scope.launch { drawerState.close() }
+                }
             )
         }) {
         NavHost(
@@ -80,6 +86,14 @@ fun AppRoot() {
             composable<StarsRoute> {
                 StarsScreen(
                     onNavigateBack = { navController.popBackStack() })
+            }
+            composable<BookmarkRoute> {
+                BookmarkScreen(
+                    onUpClick = { navController.popBackStack()},
+                    onStarClick = { star ->
+                        navController.navigate(StarsRoute(star))
+                    }
+                )
             }
         }
     }
