@@ -62,7 +62,7 @@ class HomeViewModel : ViewModel() {
         )
 
         val topStar = TopStar(
-            id = 12345, // Beispiel ID für Sirius
+            id = 8399845, // Sirius
             name = "Sirius", description = "so schön ja"
         )
 

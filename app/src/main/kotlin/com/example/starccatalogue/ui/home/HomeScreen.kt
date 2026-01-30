@@ -327,7 +327,7 @@ private fun HomeScreenPreview() {
                 "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
             )
         ), topStar = TopStar(
-            id = 1, name = "Sirius", description = "so schön ja"
+            id = 8399845, name = "Sirius", description = "so schön ja"
         )
     )
     MaterialTheme {
@@ -354,7 +354,7 @@ private fun SearchBarPreview() {
 @Composable
 private fun TopStarCardPreview() {
     val topStar = TopStar(
-        id = 1, name = "Sirius", description = "so schön ja"
+        id = 8399845, name = "Sirius", description = "so schön ja"
     )
     MaterialTheme { TopStarCard(topStar = topStar, onProfileClick = {}) }
 }

@@ -3,16 +3,16 @@ package com.example.starccatalogue.network
 import android.os.Build
 import androidx.annotation.RequiresApi
 
-data class StarOverview(val oid : Int, val name : String, val typ : String)
+data class StarOverview(val oid: Int, val name: String, val typ: String)
 data class StarDetails(
-    val oid : Int,
-    val name : String,
-    val ra : Float,
-    val dec : Float,
-    val mag : Float,
-    val shortType : String,
-    val type : String,
-    )
+    val oid: Int,
+    val name: String,
+    val ra: Float,
+    val dec: Float,
+    val mag: Float,
+    val shortType: String,
+    val type: String,
+)
 
 /**
  * Abstraction for retrieving star catalogue data.
@@ -36,7 +36,7 @@ interface StarDataSource {
      * @return a [QueryBuilder] instance that can be configured and executed to retrieve
      *   a list of [StarOverview] entries.
      */
-    fun listStarsRequest() : QueryBuilder
+    fun listStarsRequest(): QueryBuilder
 
     /**
      * Retrieves detailed information about a single star identified by [oid].
@@ -45,7 +45,7 @@ interface StarDataSource {
      * @return a [StarDetails] instance for the requested star, or `null` if no
      *   star with the given [oid] exists in the data source.
      */
-    fun getStarDetails(oid : Int) : StarDetails?
+    fun getStarDetails(oid: Int): StarDetails?
 }
 
 /**
@@ -58,8 +58,8 @@ interface StarDataSource {
  * @property operator the comparison operator (e.g., "=", "LIKE", ">", "<").
  * @property value the value to compare against (should be properly escaped/quoted for SQL).
  */
-data class Filter(val field : String, val operator : String = "=", val value : String){
-    companion object{
+data class Filter(val field: String, val operator: String = "=", val value: String) {
+    companion object {
         /**
          * Creates a filter that matches field values containing the given substring.
          *
@@ -67,7 +67,7 @@ data class Filter(val field : String, val operator : String = "=", val value : S
          * @param value the substring to search for.
          * @return a Filter using the LIKE operator with wildcards on both sides.
          */
-        fun contains(field: String, value : String) = like(field, "%$value%")
+        fun contains(field: String, value: String) = like(field, "%$value%")
 
         /**
          * Creates a filter using the LIKE operator with a custom pattern.
@@ -76,7 +76,7 @@ data class Filter(val field : String, val operator : String = "=", val value : S
          * @param value the LIKE pattern (may include % and _ wildcards).
          * @return a Filter using the LIKE operator.
          */
-        fun like(field: String, value : String) = Filter(field, "LIKE", "'$value'")
+        fun like(field: String, value: String) = Filter(field, "LIKE", "'$value'")
     }
 
     /**
@@ -85,7 +85,7 @@ data class Filter(val field : String, val operator : String = "=", val value : S
      * @param table the table name to prefix the field with.
      * @return a SQL fragment in the form "table.field operator value".
      */
-    fun build(table : String) = "${table}.$field $operator $value"
+    fun build(table: String) = "${table}.$field $operator $value"
 }
 
 /**
@@ -97,7 +97,7 @@ data class Filter(val field : String, val operator : String = "=", val value : S
  * @property field the field name to use for sorting.
  * @property direction the sort direction, either "ASC" (ascending) or "DESC" (descending). Defaults to "ASC".
  */
-data class Ordering(val table : String, val field : String, val direction: String = "ASC"){
+data class Ordering(val table: String, val field: String, val direction: String = "ASC") {
     /**
      * Builds the SQL ORDER BY clause for this ordering.
      *
@@ -122,7 +122,7 @@ data class Ordering(val table : String, val field : String, val direction: Strin
  *     .fetch()
  * ```
  */
-interface QueryBuilder{
+interface QueryBuilder {
     /**
      * Adds a filter condition to the query for a specific table.
      *
@@ -133,7 +133,7 @@ interface QueryBuilder{
      * @param filter the filter condition to apply.
      * @return this QueryBuilder instance for method chaining.
      */
-    fun filter(table: String, filter: Filter) : QueryBuilder
+    fun filter(table: String, filter: Filter): QueryBuilder
 
     /**
      * Sets the ordering for the query results.
@@ -144,7 +144,7 @@ interface QueryBuilder{
      * @param ordering the ordering specification defining which field to sort by and the direction.
      * @return this QueryBuilder instance for method chaining.
      */
-    fun order(ordering: Ordering) : QueryBuilder
+    fun order(ordering: Ordering): QueryBuilder
 
     /**
      * Limits the maximum number of results returned by the query.
@@ -155,7 +155,7 @@ interface QueryBuilder{
      * @param limit the maximum number of [StarOverview] entries to return. Must be positive.
      * @return this QueryBuilder instance for method chaining.
      */
-    fun limit(limit : Int) : QueryBuilder
+    fun limit(limit: Int): QueryBuilder
 
     /**
      * Executes the query and retrieves the results.
@@ -166,54 +166,56 @@ interface QueryBuilder{
      * @return a list of [StarOverview] entries matching the query criteria.
      *   Returns an empty list if no matches are found or if an error occurs.
      */
-    fun fetch() : List<StarOverview>
+    fun fetch(): List<StarOverview>
 }
 
-private class ADQLQueryBuilder(val fetchFunction: (String) -> List<StarOverview>) : QueryBuilder{
-    private var filterMap : MutableMap<String, MutableList<Filter>> = mutableMapOf()
+private class ADQLQueryBuilder(val fetchFunction: (String) -> List<StarOverview>) : QueryBuilder {
+    private var filterMap: MutableMap<String, MutableList<Filter>> = mutableMapOf()
     private var ordering: Ordering? = null
-    private var limit : Int? = null
+    private var limit: Int? = null
 
     override fun fetch(): List<StarOverview> {
         return fetchFunction(this.build())
     }
 
-    override fun filter(table: String, filter: Filter) : ADQLQueryBuilder{
+    override fun filter(table: String, filter: Filter): ADQLQueryBuilder {
         val filters = filterMap[table]
-        if (filters != null){
+        if (filters != null) {
             filters.add(filter)
-        }else{
+        } else {
             filterMap[table] = mutableListOf(filter)
         }
         return this
     }
 
-    override fun order(ordering: Ordering) : ADQLQueryBuilder{
+    override fun order(ordering: Ordering): ADQLQueryBuilder {
         this.ordering = ordering
         return this
     }
 
-    override fun limit(limit : Int) : ADQLQueryBuilder{
+    override fun limit(limit: Int): ADQLQueryBuilder {
         this.limit = limit
         return this
     }
 
-    fun build() : String{
+    fun build(): String {
         val builder = StringBuilder()
-        builder.appendLine("""
+        builder.appendLine(
+            """
             SELECT ${if (this.limit != null) "TOP $limit" else ""} 
                 basic.oid,
                 ident.id,
                 otypedef.description
             FROM ident
-            JOIN basic on basic.oid = ident.oidref""".trimIndent())
+            JOIN basic on basic.oid = ident.oidref""".trimIndent()
+        )
         filterMap["basic"]?.forEach { builder.appendLine("AND ${it.build("basic")}") }
         filterMap["ident"]?.forEach { builder.appendLine("AND ${it.build("ident")}") }
         builder.appendLine("LEFT JOIN otypedef ON otypedef.otype = basic.otype")
         filterMap["otypedef"]?.forEach { builder.appendLine("AND ${it.build("otypedef")}") }
 
         filterMap.forEach { it ->
-            if (it.key in arrayOf("basic","ident","otypedef")){
+            if (it.key in arrayOf("basic", "ident", "otypedef")) {
                 return@forEach
             }
             val table = it.key
@@ -221,7 +223,7 @@ private class ADQLQueryBuilder(val fetchFunction: (String) -> List<StarOverview>
             it.value.forEach { builder.appendLine("AND ${it.build(table)}") }
         }
         ordering?.let {
-            if (filterMap[it.table] == null){
+            if (filterMap[it.table] == null) {
                 builder.appendLine("LEFT JOIN ${it.table} ON ${it.table}.oidref = ident.oidref")
             }
             builder.appendLine(it.build())
@@ -230,10 +232,10 @@ private class ADQLQueryBuilder(val fetchFunction: (String) -> List<StarOverview>
     }
 }
 
-class SimbadSQLSource(val simbad: Simbad) : StarDataSource{
+class SimbadSQLSource(val simbad: Simbad) : StarDataSource {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    override fun listStarsRequest() : QueryBuilder {
-        return ADQLQueryBuilder(fun (query : String) : List<StarOverview>{
+    override fun listStarsRequest(): QueryBuilder {
+        return ADQLQueryBuilder(fun(query: String): List<StarOverview> {
             val stars = mutableListOf<StarOverview>()
             val table = simbad.fetchData(query)?.buildStarTable() ?: return stars
 
@@ -242,13 +244,15 @@ class SimbadSQLSource(val simbad: Simbad) : StarDataSource{
                 // Iterate through all rows
                 while (rowSequence.next()) {
                     val row = rowSequence.row
-                    stars.add(StarOverview(
-                        row[0].toString().toInt(),
-                        row[1].toString().substring(5),
-                        row[2].toString(),
-                    ))
+                    stars.add(
+                        StarOverview(
+                            row[0].toString().toInt(),
+                            row[1].toString().substring(5),
+                            row[2].toString(),
+                        )
+                    )
                 }
-            }catch(_: Exception){
+            } catch (_: Exception) {
                 println("Invalid table row: ${rowSequence.row}")
                 return mutableListOf()
             }
@@ -270,6 +274,10 @@ class SimbadSQLSource(val simbad: Simbad) : StarDataSource{
         """.trimIndent()
 
         val table = simbad.fetchData(query)?.buildStarTable() ?: return null
+        if (table.rowCount == 0L) {
+            println("No data found for oid: $oid")
+            return null
+        }
         val row = table.getRow(0)
         try {
             return StarDetails(
@@ -281,7 +289,7 @@ class SimbadSQLSource(val simbad: Simbad) : StarDataSource{
                 row[5].toString(),
                 row[6].toString(),
             )
-        }catch(_: Exception){
+        } catch (_: Exception) {
             println("Invalid table row: $row")
             return null
         }
