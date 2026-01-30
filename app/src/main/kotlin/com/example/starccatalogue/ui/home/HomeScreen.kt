@@ -49,7 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
-    onProfileClick: () -> Unit = {},
+    onProfileClick: (Int) -> Unit = {},
     onEventClick: (EventRow) -> Unit = {},
     onSearch: (String) -> Unit = {},
 ) {
@@ -67,7 +67,7 @@ fun HomeScreen(
 @Composable
 private fun HomeScreen(
     uiState: HomeUiState,
-    onProfileClick: () -> Unit,
+    onProfileClick: (Int) -> Unit,
     onEventClick: (EventRow) -> Unit,
     onSearch: (String) -> Unit,
 ) {
@@ -149,7 +149,7 @@ private fun SearchBar(
 
 @Composable
 private fun TopStarCard(
-    topStar: TopStar?, onProfileClick: () -> Unit
+    topStar: TopStar?, onProfileClick: (Int) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
@@ -201,7 +201,7 @@ private fun TopStarCard(
                 Row(
                     modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                 ) {
-                    Button(onClick = onProfileClick) {
+                    Button(onClick = { topStar?.id?.let { onProfileClick(it) } }) {
                         Text("zum Profil")
                     }
                 }
@@ -327,7 +327,7 @@ private fun HomeScreenPreview() {
                 "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
             )
         ), topStar = TopStar(
-            name = "Sirius", description = "so schön ja"
+            id = 1, name = "Sirius", description = "so schön ja"
         )
     )
     MaterialTheme {
@@ -354,7 +354,7 @@ private fun SearchBarPreview() {
 @Composable
 private fun TopStarCardPreview() {
     val topStar = TopStar(
-        name = "Sirius", description = "so schön ja"
+        id = 1, name = "Sirius", description = "so schön ja"
     )
     MaterialTheme { TopStarCard(topStar = topStar, onProfileClick = {}) }
 }

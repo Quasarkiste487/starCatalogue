@@ -120,11 +120,13 @@ fun AppRoot() {
                         launchSingleTop = true
                         restoreState = true
                     }
+                }, onProfileClick = { starId ->
+                    navController.navigate(StarsRoute(starId))
                 })
             }
             composable<ListR> {
-                ListS(onStarClick = { star ->
-                    navController.navigate(StarsRoute(star))
+                ListS(onStarClick = { starId ->
+                    navController.navigate(StarsRoute(starId))
                 })
             }
             composable<StarsRoute> {
