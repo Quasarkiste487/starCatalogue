@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.starccatalogue.network.StarDataSource
+import com.example.starccatalogue.network.StarOverview
+import com.example.starccatalogue.util.Bookmarks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,11 +20,14 @@ data class StarUiState(
     val magnitude: Float = 0.0f,
     val ra: Float = 0.0f,
     val dec: Float = 0.0f,
-    val isLoading: Boolean = true
+    val type: String = "",
+    val isLoading: Boolean = true,
+    val isBookmarked: Boolean = false
 )
 
 class StarsViewModel(
     private val starSource: StarDataSource,
+    private val bookmarks: Bookmarks,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -46,11 +51,26 @@ class StarsViewModel(
                         dec = star.dec,
                         isLoading = false,
                         name = star.name,
+                        type = star.type,
+                        isBookmarked = bookmarks.isBookmark(star.oid)
                     )
                 } else {
                     StarUiState(id = starId, isLoading = false)
                 }
             }
+        }
+    }
+
+    fun toggleBookmark() {
+        val currentState = _starState.value
+        if (currentState.isBookmarked) {
+            bookmarks.removeBookmark(currentState.id)
+        } else {
+            val starOverview = StarOverview(oid = currentState.id, name = currentState.name, typ = currentState.type )
+            bookmarks.addBookmark(starOverview)
+        }
+        viewModelScope.launch {
+            _starState.update { it.copy(isBookmarked = !it.isBookmarked) }
         }
     }
 }

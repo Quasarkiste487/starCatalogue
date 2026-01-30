@@ -2,7 +2,9 @@ package com.example.starccatalogue.network
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class StarOverview(val oid: Int, val name: String, val typ: String)
 data class StarDetails(
     val oid: Int,
