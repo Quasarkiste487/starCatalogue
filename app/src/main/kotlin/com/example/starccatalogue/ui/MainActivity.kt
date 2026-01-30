@@ -8,8 +8,8 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -68,10 +68,10 @@ fun AppRoot() {
                     })
                 NavigationBarItem(
                     icon = {
-                    Icon(
-                        Icons.Default.List, contentDescription = "Verzeichnis"
-                    )
-                },
+                        Icon(
+                            Icons.AutoMirrored.Filled.List, contentDescription = "Verzeichnis"
+                        )
+                    },
                     label = { Text("Verzeichnis") },
                     selected = currentDestination?.hierarchy?.any {
                         it.hasRoute<ListR>()
@@ -87,10 +87,10 @@ fun AppRoot() {
                     })
                 NavigationBarItem(
                     icon = {
-                    Icon(
-                        Icons.Default.Settings, contentDescription = "Einstellungen"
-                    )
-                },
+                        Icon(
+                            Icons.Default.Settings, contentDescription = "Einstellungen"
+                        )
+                    },
                     label = { Text("Einstellungen") },
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<SettingsRoute>() } == true,
                     onClick = {
