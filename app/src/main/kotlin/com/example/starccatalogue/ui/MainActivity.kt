@@ -68,12 +68,14 @@ fun AppRoot() {
                     })
                 NavigationBarItem(
                     icon = {
-                        Icon(
-                            Icons.Default.List, contentDescription = "Verzeichnis"
-                        )
-                    },
+                    Icon(
+                        Icons.Default.List, contentDescription = "Verzeichnis"
+                    )
+                },
                     label = { Text("Verzeichnis") },
-                    selected = currentDestination?.hierarchy?.any { it.hasRoute<ListR>() } == true,
+                    selected = currentDestination?.hierarchy?.any {
+                        it.hasRoute<ListR>()
+                    } == true,
                     onClick = {
                         navController.navigate(ListR("")) {
                             popUpTo(navController.graph.findStartDestination().id) {
@@ -85,10 +87,10 @@ fun AppRoot() {
                     })
                 NavigationBarItem(
                     icon = {
-                        Icon(
-                            Icons.Default.Settings, contentDescription = "Einstellungen"
-                        )
-                    },
+                    Icon(
+                        Icons.Default.Settings, contentDescription = "Einstellungen"
+                    )
+                },
                     label = { Text("Einstellungen") },
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<SettingsRoute>() } == true,
                     onClick = {
@@ -111,7 +113,13 @@ fun AppRoot() {
         ) {
             composable<HomeRoute> {
                 HomeScreen(onSearch = { starName ->
-                    navController.navigate(ListR(starName))
+                    navController.navigate(ListR(starName)) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 })
             }
             composable<ListR> {

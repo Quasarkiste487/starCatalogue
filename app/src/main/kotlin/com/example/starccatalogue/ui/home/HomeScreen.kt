@@ -100,7 +100,6 @@ private fun HomeScreen(
 private fun SearchBar(
     modifier: Modifier = Modifier,
     placeholder: String = "Sterne suchen...",
-    onMenuClick: () -> Unit = {},
     onSearch: (String) -> Unit
 ) {
     var value by remember { mutableStateOf("") }
@@ -346,7 +345,7 @@ private fun HomeScreenPreview() {
 private fun SearchBarPreview() {
     MaterialTheme {
         Box(modifier = Modifier.background(Color.White)) {
-            SearchBar(modifier = Modifier.padding(16.dp), onMenuClick = {}, onSearch = {})
+            SearchBar(modifier = Modifier.padding(16.dp), onSearch = {})
         }
     }
 }
