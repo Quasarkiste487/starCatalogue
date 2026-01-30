@@ -69,6 +69,8 @@ class StarsViewModel(
             val starOverview = StarOverview(oid = currentState.id, name = currentState.name, typ = currentState.type )
             bookmarks.addBookmark(starOverview)
         }
-        _starState.update { it.copy(isBookmarked = !it.isBookmarked) }
+        viewModelScope.launch {
+            _starState.update { it.copy(isBookmarked = !it.isBookmarked) }
+        }
     }
 }

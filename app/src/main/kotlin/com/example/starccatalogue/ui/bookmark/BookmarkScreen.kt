@@ -43,7 +43,7 @@ fun BookmarkScreen (
     onUpClick: () -> Unit,
     viewModel: BookmarkViewModel = koinViewModel(),
 ) {
-    val stars by viewModel.stars.collectAsStateWithLifecycle()
+    val stars by viewModel.starlist.collectAsStateWithLifecycle()
     BookmarkScreen(
         stars = stars,
         onUpClick = onUpClick,
@@ -67,7 +67,7 @@ private fun BookmarkScreen(
                     IconButton(onClick = onUpClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "",
+                            contentDescription = "Zurück",
                         )
                     }
                 },
