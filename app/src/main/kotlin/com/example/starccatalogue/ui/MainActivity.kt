@@ -136,12 +136,9 @@ fun AppRoot() {
                     onNavigateBack = { navController.popBackStack() })
             }
             composable<BookmarkRoute> {
-                BookmarkScreen(
-                    onUpClick = { navController.popBackStack()},
-                    onStarClick = { star ->
-                        navController.navigate(StarsRoute(star))
-                    }
-                )
+                BookmarkScreen(onUpClick = { navController.popBackStack() }, onStarClick = { star ->
+                    navController.navigate(StarsRoute(star))
+                })
             }
             composable<SettingsRoute> {
                 SettingsScreen()
