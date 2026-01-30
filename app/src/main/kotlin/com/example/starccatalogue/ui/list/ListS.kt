@@ -25,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -69,23 +70,27 @@ private fun ListS(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = onSearchQueryChange,
-                onSearch = { onSearch() },
-                active = false,
-                onActiveChange = {},
-                placeholder = { Text("Suchergebnisse") },
-                trailingIcon = {
-                    IconButton(onClick = onSearch) {
-                        Icon(Icons.Filled.Search, contentDescription = "Search")
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 16.dp)
-            ) { }
+            Surface(
+                color = MaterialTheme.colorScheme.surface,
+            ) {
+                SearchBar(
+                    query = searchQuery,
+                    onQueryChange = onSearchQueryChange,
+                    onSearch = { onSearch() },
+                    active = false,
+                    onActiveChange = {},
+                    placeholder = { Text("Suchergebnisse") },
+                    trailingIcon = {
+                        IconButton(onClick = onSearch) {
+                            Icon(Icons.Filled.Search, contentDescription = "Search")
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 16.dp)
+                ) { }
+            }
         },
     ) { innerPadding ->
         LazyColumn(
