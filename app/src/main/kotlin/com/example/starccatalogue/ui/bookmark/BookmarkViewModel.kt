@@ -13,12 +13,12 @@ import kotlinx.coroutines.flow.onEach
 class BookmarkViewModel(
     private val bookmarks: Bookmarks
 ): ViewModel() {
-    private val _starlist: MutableStateFlow<List<StarOverview>> = MutableStateFlow(emptyList())
-    val starlist: StateFlow<List<StarOverview>> = _starlist.asStateFlow()
+    private val _starList: MutableStateFlow<List<StarOverview>> = MutableStateFlow(emptyList())
+    val starList: StateFlow<List<StarOverview>> = _starList.asStateFlow()
 
     init {
         bookmarks.bookmarksFlow
-            .onEach { starList -> _starlist.value = starList }
+            .onEach { starList -> _starList.value = starList }
             .launchIn(viewModelScope)
     }
 }

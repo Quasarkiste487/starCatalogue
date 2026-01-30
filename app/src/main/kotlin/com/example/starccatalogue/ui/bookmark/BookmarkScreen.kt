@@ -43,7 +43,7 @@ fun BookmarkScreen (
     onUpClick: () -> Unit,
     viewModel: BookmarkViewModel = koinViewModel(),
 ) {
-    val stars by viewModel.starlist.collectAsStateWithLifecycle()
+    val stars by viewModel.starList.collectAsStateWithLifecycle()
     BookmarkScreen(
         stars = stars,
         onUpClick = onUpClick,

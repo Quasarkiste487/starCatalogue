@@ -4,7 +4,6 @@ import android.content.Context
 import com.example.starccatalogue.network.StarOverview
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
