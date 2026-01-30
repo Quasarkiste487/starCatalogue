@@ -99,7 +99,7 @@ private fun HomeScreen(
 @Composable
 private fun SearchBar(
     modifier: Modifier = Modifier,
-    placeholder: String = "Sterne",
+    placeholder: String = "Sterne suchen...",
     onMenuClick: () -> Unit = {},
     onSearch: (String) -> Unit
 ) {
@@ -117,13 +117,13 @@ private fun SearchBar(
                 .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onMenuClick, enabled = false) {
-                Icon(
-                    imageVector = Icons.Filled.Star,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(all = 4.dp)
+            )
+
             BasicTextField(
                 value = value,
                 onValueChange = { value = it },
@@ -142,7 +142,7 @@ private fun SearchBar(
                 innerTextField()
             }
             IconButton(onClick = { onSearch(value) }) {
-                Icon(imageVector = Icons.Filled.Search, contentDescription = "Suche")
+                Icon(imageVector = Icons.Filled.Search, contentDescription = "Suchen")
             }
         }
     }
