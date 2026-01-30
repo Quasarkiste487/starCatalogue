@@ -49,7 +49,7 @@ fun AppRoot() {
                     scope.launch { drawerState.close() }
                 },
                 onStarListClick = {
-                    navController.navigate(ListR)
+                    navController.navigate(ListR(""))
                     scope.launch { drawerState.close() }
                 },
             )
@@ -62,18 +62,14 @@ fun AppRoot() {
             modifier = Modifier.fillMaxSize(),
         ) {
             composable<HomeRoute> {
-                HomeScreen(
-                    onOpenDrawer = {
-                        scope.launch { drawerState.open() }
-                    },
-                    onSearch = { starName ->
-                        navController.navigate(ListR(starName))
-                    }
-                )
+                HomeScreen(onOpenDrawer = {
+                    scope.launch { drawerState.open() }
+                }, onSearch = { starName ->
+                    navController.navigate(ListR(starName))
+                })
             }
             composable<ListR> {
-                ListS(onUpClick = { navController.popBackStack() },
-                    onStarClick = { star ->
+                ListS(onUpClick = { navController.popBackStack() }, onStarClick = { star ->
                     navController.navigate(StarsRoute(star))
                 })
             }
