@@ -14,20 +14,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -38,15 +36,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.starccatalogue.network.StarOverview
 import com.example.starccatalogue.ui.theme.StarcCatalogueTheme
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ListS (
+fun ListS(
     onStarClick: (Int) -> Unit,
-    onUpClick: () -> Unit,
     viewModel: ListVM = koinViewModel(),
 ) {
     val stars by viewModel.stars.collectAsStateWithLifecycle()
@@ -54,7 +50,6 @@ fun ListS (
     ListS(
         stars = stars,
         searchQuery = searchQuery,
-        onUpClick = onUpClick,
         onStarClick = onStarClick,
         onSearchQueryChange = viewModel::updateSearchQuery,
         onSearch = viewModel::search,
@@ -67,33 +62,30 @@ fun ListS (
 private fun ListS(
     stars: List<StarOverview>,
     searchQuery: String,
-    onUpClick: () -> Unit,
     onStarClick: (Int) -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onSearch: () -> Unit,
 ) {
     Scaffold(
-    modifier = Modifier.fillMaxSize(),
-    topBar = {
-        CenterAlignedTopAppBar(
-            navigationIcon = {
-                IconButton(onClick = onUpClick) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                        contentDescription = "",
-                    )
-                }
-            },
-            title = {
-                SearchTextField(
-                    value = searchQuery,
-                    onValueChange = onSearchQueryChange,
-                    onSearch = onSearch,
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-        )
-    },
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = onSearchQueryChange,
+                onSearch = { onSearch() },
+                active = false,
+                onActiveChange = {},
+                placeholder = { Text("Suchergebnisse") },
+                trailingIcon = {
+                    IconButton(onClick = onSearch) {
+                        Icon(Icons.Filled.Search, contentDescription = "Search")
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) { }
+        },
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
@@ -108,8 +100,7 @@ private fun ListS(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     elevation = CardDefaults.cardElevation(
-                        defaultElevation = 2.dp,
-                        pressedElevation = 6.dp
+                        defaultElevation = 2.dp, pressedElevation = 6.dp
                     ),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -165,26 +156,6 @@ private fun ListS(
     }
 }
 
-@Composable
-private fun SearchTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    onSearch: () -> Unit,
-) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        singleLine = true,
-        placeholder = { Text("Suchergebnisse") },
-        trailingIcon = {
-            IconButton(onClick = onSearch) {
-                Icon(Icons.Filled.Search, contentDescription = "Search")
-            }
-        },
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -197,7 +168,6 @@ private fun ListScreenPreview() {
                 StarOverview(3, "Arcturus", "Giant"),
             ),
             searchQuery = "Sirius",
-            onUpClick = {},
             onStarClick = {},
             onSearchQueryChange = {},
             onSearch = {},

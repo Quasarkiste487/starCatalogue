@@ -115,7 +115,7 @@ fun AppRoot() {
                 })
             }
             composable<ListR> {
-                ListS(onUpClick = { navController.popBackStack() }, onStarClick = { star ->
+                ListS(onStarClick = { star ->
                     navController.navigate(StarsRoute(star))
                 })
             }
