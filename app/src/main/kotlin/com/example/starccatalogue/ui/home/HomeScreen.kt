@@ -20,7 +20,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -52,7 +51,6 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
     onProfileClick: () -> Unit = {},
     onEventClick: (EventRow) -> Unit = {},
-    onOpenDrawer: () -> Unit = {},
     onSearch: (String) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -61,7 +59,6 @@ fun HomeScreen(
         uiState = uiState,
         onProfileClick = onProfileClick,
         onEventClick = onEventClick,
-        onOpenDrawer = onOpenDrawer,
         onSearch = onSearch,
     )
 }
@@ -72,7 +69,6 @@ private fun HomeScreen(
     uiState: HomeUiState,
     onProfileClick: () -> Unit,
     onEventClick: (EventRow) -> Unit,
-    onOpenDrawer: () -> Unit,
     onSearch: (String) -> Unit,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -83,7 +79,7 @@ private fun HomeScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            SearchBar(onMenuClick = onOpenDrawer, onSearch = onSearch)
+            SearchBar(onSearch = onSearch)
             Spacer(Modifier.height(16.dp))
             TopStarCard(
                 topStar = uiState.topStar, onProfileClick = onProfileClick
@@ -121,8 +117,12 @@ private fun SearchBar(
                 .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onMenuClick) {
-                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menü")
+            IconButton(onClick = onMenuClick, enabled = false) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
             BasicTextField(
                 value = value,
@@ -313,13 +313,11 @@ private fun HomeScreenPreview() {
                 "Sonnenfinsternis",
                 "Description duis aute irure dolor in reprehenderit in voluptate velit.",
                 "Taggesamtzeit - 10:00"
-            ),
-            EventRow(
+            ), EventRow(
                 "Mars und Saturn stehen im Zwiespalt",
                 "Description duis aute irure dolor in reprehenderit in voluptate velit.",
                 "Stundenhalbzeit - 10:30"
-            ),
-            EventRow(
+            ), EventRow(
                 "Pluto wird wieder Planet",
                 "Description duis aute irure dolor in reprehenderit in voluptate velit.",
                 "Normalzeit - 13:37"
@@ -338,7 +336,6 @@ private fun HomeScreenPreview() {
             uiState = previewState,
             onProfileClick = {},
             onEventClick = {},
-            onOpenDrawer = {},
             onSearch = {},
         )
     }
@@ -349,8 +346,7 @@ private fun HomeScreenPreview() {
 private fun SearchBarPreview() {
     MaterialTheme {
         Box(modifier = Modifier.background(Color.White)) {
-            SearchBar(
-                modifier = Modifier.padding(16.dp), onMenuClick = {}, onSearch = {})
+            SearchBar(modifier = Modifier.padding(16.dp), onMenuClick = {}, onSearch = {})
         }
     }
 }
@@ -386,13 +382,11 @@ private fun EventsListPreview() {
                     "Sonnenfinsternis",
                     "Description duis aute irure dolor in reprehenderit in voluptate velit.",
                     "Taggesamtzeit - 10:00"
-                ),
-                EventRow(
+                ), EventRow(
                     "Mars und Saturn stehen im Zwiespalt",
                     "Description duis aute irure dolor in reprehenderit in voluptate velit.",
                     "Stundenhalbzeit - 10:30"
-                ),
-                EventRow(
+                ), EventRow(
                     "Pluto wird wieder Planet",
                     "Description duis aute irure dolor in reprehenderit in voluptate velit.",
                     "Normalzeit - 13:37"
