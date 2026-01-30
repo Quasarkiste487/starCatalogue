@@ -20,6 +20,8 @@ ksp = "2.3.2" # Kotlin Symbol Processing (Annotations) for Moshi Json Parsing
 navigation = "2.9.6" # Navigation for Compose
 kotlinxSerialization = "1.9.0" # For Navigation Route serialization
 
+# Dependency Injection
+koin = "4.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,6 +51,10 @@ retrofit-loggingInterceptor = { module = "com.squareup.okhttp3:logging-intercept
 moshi-core = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-adapters = { module = "com.squareup.moshi:moshi-adapters", version.ref = "moshi" }
 moshi-annotationProcessor = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshi" }
+
+# Koin
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+koin-compose = { group = "io.insert-koin", name = "koin-compose-viewmodel", version.ref = "koin" }
 
 # Icons
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "compose-icons" }

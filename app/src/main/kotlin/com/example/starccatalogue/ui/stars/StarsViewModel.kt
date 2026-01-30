@@ -1,11 +1,9 @@
 package com.example.starccatalogue.ui.stars
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.starccatalogue.network.Simbad
-import com.example.starccatalogue.network.SimbadSQLSource
+import androidx.navigation.toRoute
 import com.example.starccatalogue.network.StarDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,8 +21,12 @@ data class StarUiState(
     val isLoading: Boolean = true
 )
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-class StarsViewModel(private val starId: Int): ViewModel(){
+class StarsViewModel(
+    private val starSource: StarDataSource,
+    savedStateHandle: SavedStateHandle,
+) : ViewModel() {
+
+    private val starId: Int = savedStateHandle.toRoute<StarsRoute>().starId
     private val _starState: MutableStateFlow<StarUiState> = MutableStateFlow(StarUiState())
     val starState: StateFlow<StarUiState> = _starState.asStateFlow()
 
@@ -32,22 +34,19 @@ class StarsViewModel(private val starId: Int): ViewModel(){
         loadData()
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun loadData() {
         viewModelScope.launch(Dispatchers.IO) {
-            val repo : StarDataSource = SimbadSQLSource(simbad = Simbad())
-            val star = repo.getStarDetails(starId)
-
+            val star = starSource.getStarDetails(starId)
             _starState.update {
-                if(star != null) {
-                        StarUiState(
-                            id = star.oid,
-                            magnitude = star.mag,
-                            ra = star.ra,
-                            dec = star.dec,
-                            isLoading = false,
-                            name = star.name,
-                        )
+                if (star != null) {
+                    StarUiState(
+                        id = star.oid,
+                        magnitude = star.mag,
+                        ra = star.ra,
+                        dec = star.dec,
+                        isLoading = false,
+                        name = star.name,
+                    )
                 } else {
                     StarUiState(id = starId, isLoading = false)
                 }
