@@ -91,8 +91,7 @@ fun AppRoot() {
                 NavigationBarItem(
                     icon = {
                         Icon(
-                            Icons.Default.BookmarkBorder,
-                            contentDescription = "Lesezeichen"
+                            Icons.Default.BookmarkBorder, contentDescription = "Lesezeichen"
                         )
                     },
                     label = { Text("Lesezeichen") },
@@ -138,9 +137,7 @@ fun AppRoot() {
             composable<HomeRoute> {
                 HomeScreen(onSearch = { starName ->
                     navController.navigate(ListR(starName)) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
+
                         launchSingleTop = true
                         restoreState = true
                     }
@@ -158,7 +155,7 @@ fun AppRoot() {
                     onNavigateBack = { navController.popBackStack() })
             }
             composable<BookmarkRoute> {
-                BookmarkScreen(onUpClick = { navController.popBackStack() }, onStarClick = { star ->
+                BookmarkScreen(onStarClick = { star ->
                     navController.navigate(StarsRoute(star))
                 })
             }
