@@ -9,6 +9,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -87,6 +88,27 @@ fun AppRoot() {
                             restoreState = true
                         }
                     })
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            Icons.Default.BookmarkBorder,
+                            contentDescription = "Lesezeichen"
+                        )
+                    },
+                    label = { Text("Lesezeichen") },
+                    selected = currentDestination?.hierarchy?.any {
+                        it.hasRoute<BookmarkRoute>()
+                    } == true,
+                    onClick = {
+                        navController.navigate(BookmarkRoute) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                )
                 NavigationBarItem(
                     icon = {
                         Icon(
