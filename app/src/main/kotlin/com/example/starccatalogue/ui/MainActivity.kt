@@ -141,7 +141,7 @@ fun AppRoot() {
                             saveState = true
                         }
                         launchSingleTop = true
-                        restoreState = true
+                        restoreState = false
                     }
                 }, onProfileClick = { starId ->
                     navController.navigate(StarsRoute(starId))
