@@ -79,7 +79,7 @@ private fun ListS(
                     onSearch = { onSearch() },
                     active = false,
                     onActiveChange = {},
-                    placeholder = { Text("Suchergebnisse") },
+                    placeholder = { Text("Sterne suchen...") },
                     trailingIcon = {
                         IconButton(onClick = onSearch) {
                             Icon(Icons.Filled.Search, contentDescription = "Search")

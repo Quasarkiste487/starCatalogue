@@ -137,9 +137,7 @@ fun AppRoot() {
             composable<HomeRoute> {
                 HomeScreen(onSearch = { starName ->
                     navController.navigate(ListR(starName)) {
-
                         launchSingleTop = true
-                        restoreState = true
                     }
                 }, onProfileClick = { starId ->
                     navController.navigate(StarsRoute(starId))

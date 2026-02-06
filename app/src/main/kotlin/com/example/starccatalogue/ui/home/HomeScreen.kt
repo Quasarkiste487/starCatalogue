@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
@@ -29,16 +28,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,9 +51,12 @@ fun HomeScreen(
     onSearch: (String) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     HomeScreen(
         uiState = uiState,
+        searchQuery = searchQuery,
+        onSearchQueryChange = viewModel::updateSearchQuery,
         onProfileClick = onProfileClick,
         onEventClick = onEventClick,
         onSearch = onSearch,
@@ -67,6 +67,8 @@ fun HomeScreen(
 @Composable
 private fun HomeScreen(
     uiState: HomeUiState,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
     onProfileClick: (Int) -> Unit,
     onEventClick: (EventRow) -> Unit,
     onSearch: (String) -> Unit,
@@ -76,11 +78,33 @@ private fun HomeScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
         ) {
-            SearchBar(onSearch = onSearch)
-            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "Stars in your hand",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Light,
+                textAlign = TextAlign.Center,
+                fontStyle = FontStyle.Italic,
+                modifier = Modifier.fillMaxWidth()
+            )
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = onSearchQueryChange,
+                onSearch = { onSearch(it) },
+                active = false,
+                onActiveChange = {},
+                placeholder = { Text("Sterne suchen...") },
+                trailingIcon = {
+                    IconButton(onClick = { onSearch(searchQuery) }) {
+                        Icon(Icons.Filled.Search, contentDescription = "Suchen")
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+            ) { }
             TopStarCard(
                 topStar = uiState.topStar, onProfileClick = onProfileClick
             )
@@ -92,57 +116,6 @@ private fun HomeScreen(
             EventsList(
                 events = uiState.events, onEventClick = onEventClick
             )
-        }
-    }
-}
-
-@Composable
-private fun SearchBar(
-    modifier: Modifier = Modifier,
-    placeholder: String = "Sterne suchen...",
-    onSearch: (String) -> Unit
-) {
-    var value by remember { mutableStateOf("") }
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(52.dp),
-        color = Color(0xFFE6EAF1),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Star,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(all = 4.dp)
-            )
-
-            BasicTextField(
-                value = value,
-                onValueChange = { value = it },
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 8.dp),
-                singleLine = true,
-                textStyle = MaterialTheme.typography.bodyMedium
-            ) { innerTextField ->
-                if (value.isEmpty()) {
-                    Text(
-                        text = placeholder,
-                        style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
-                    )
-                }
-                innerTextField()
-            }
-            IconButton(onClick = { onSearch(value) }) {
-                Icon(imageVector = Icons.Filled.Search, contentDescription = "Suchen")
-            }
         }
     }
 }
@@ -333,6 +306,8 @@ private fun HomeScreenPreview() {
     MaterialTheme {
         HomeScreen(
             uiState = previewState,
+            searchQuery = "Sirius",
+            onSearchQueryChange = {},
             onProfileClick = {},
             onEventClick = {},
             onSearch = {},
@@ -340,12 +315,21 @@ private fun HomeScreenPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 private fun SearchBarPreview() {
     MaterialTheme {
         Box(modifier = Modifier.background(Color.White)) {
-            SearchBar(modifier = Modifier.padding(16.dp), onSearch = {})
+            SearchBar(
+                query = "Sirius",
+                onQueryChange = {},
+                onSearch = {},
+                active = false,
+                onActiveChange = {},
+                placeholder = { Text("Sterne suchen...") },
+                modifier = Modifier.padding(16.dp)
+            ) {}
         }
     }
 }
