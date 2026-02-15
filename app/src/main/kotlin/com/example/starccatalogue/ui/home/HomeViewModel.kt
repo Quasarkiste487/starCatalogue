@@ -1,39 +1,48 @@
-﻿package com.example.starccatalogue.ui.home
+package com.example.starccatalogue.ui.home
+
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+
 // Datenklasse für ein Event – wird auch im UI verwendet
 data class EventRow(
     val title: String,
     val subtitle: String,
     val time: String
 )
+
 // Datenklasse für den Blog-Artikel
 data class BlogArticle(
     val date: String,
     val title: String,
     val paragraphs: List<String>
 )
+
 // Datenklasse für den Top-Stern
 data class TopStar(
-    val id: Int, // Changed to Int to match StarsRoute
+    val id: String, // Changed to String to match updated StarsRoute
     val name: String,
     val description: String
 )
+
 // UI-State für den HomeScreen
 data class HomeUiState(
     val events: List<EventRow> = emptyList(),
     val blogArticle: BlogArticle? = null,
     val topStar: TopStar? = null
 )
+
 // ViewModel welchen Daten für HomeScreen bereitstellt
 class HomeViewModel : ViewModel() {
+
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+
     init {
         loadData()
     }
+
     private fun loadData() {
         val events = listOf(
             EventRow(
@@ -52,6 +61,7 @@ class HomeViewModel : ViewModel() {
                 time = "Nacht - 02:00"
             )
         )
+
         val blogArticle = BlogArticle(
             date = "15.07.2024",
             title = "Aktuelle Beobachtungen",
@@ -60,11 +70,13 @@ class HomeViewModel : ViewModel() {
                 "Auch der Sommernachtshimmel bietet mit dem Sommerdreieck gute Orientierungshilfen für Einsteiger."
             )
         )
+
         val topStar = TopStar(
-            id = 1, // Using dummy Int ID. Need to ensure this resolves to Sirius.
+            id = "Sirius",
             name = "Sirius",
             description = "Der hellste Stern am Nachthimmel."
         )
+
         _uiState.value = HomeUiState(
             events = events,
             blogArticle = blogArticle,

@@ -1,4 +1,5 @@
-﻿package com.example.starccatalogue.ui.home
+package com.example.starccatalogue.ui.home
+
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -44,15 +45,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
-    onProfileClick: (Int) -> Unit, // Changed to Int
+    // Callback when a star profile is clicked
+    onProfileClick: (String) -> Unit, // Changed to String
     onSearch: (String) -> Unit,
     onOpenDrawer: () -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     HomeScreen(
         uiState = uiState,
         onProfileClick = onProfileClick,
@@ -61,11 +65,12 @@ fun HomeScreen(
         onOpenDrawer = onOpenDrawer
     )
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
     uiState: HomeUiState,
-    onProfileClick: (Int) -> Unit, // Changed to Int
+    onProfileClick: (String) -> Unit, // Changed to String
     onEventClick: (EventRow) -> Unit,
     onSearchClick: (String) -> Unit,
     onOpenDrawer: () -> Unit
@@ -82,16 +87,19 @@ private fun HomeScreen(
             item {
                 SearchBar(onSearch = onSearchClick, onMenuClick = onOpenDrawer)
             }
+
             item {
                 uiState.topStar?.let {
                     TopStarCard(topStar = it, onProfileClick = onProfileClick)
                 }
             }
+
             item {
                 uiState.blogArticle?.let {
                     BlogSection(article = it)
                 }
             }
+
             item {
                 Text(
                     "Nächste Himmelsevent",
@@ -100,13 +108,14 @@ private fun HomeScreen(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
             }
+
             items(uiState.events) { event ->
                 EventCard(event, onClick = { onEventClick(event) })
             }
         }
     }
 }
-// ... SearchBar ... (Unchanged except signature matching likely fine)
+
 @Composable
 private fun SearchBar(
     modifier: Modifier = Modifier,
@@ -154,8 +163,9 @@ private fun SearchBar(
         }
     }
 }
+
 @Composable
-private fun TopStarCard(topStar: TopStar, onProfileClick: (Int) -> Unit) { // Changed to Int
+private fun TopStarCard(topStar: TopStar, onProfileClick: (String) -> Unit) { // Changed to String
     Card(
         modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
     ) {
@@ -213,7 +223,7 @@ private fun TopStarCard(topStar: TopStar, onProfileClick: (Int) -> Unit) { // Ch
         }
     }
 }
-// ... BlogSection, EventCard ... (Unchanged)
+
 @Composable
 private fun BlogSection(article: BlogArticle) {
     Card(
@@ -234,6 +244,7 @@ private fun BlogSection(article: BlogArticle) {
         }
     }
 }
+
 @Composable
 private fun EventCard(event: EventRow, onClick: () -> Unit) {
     Card(
@@ -279,6 +290,7 @@ private fun EventCard(event: EventRow, onClick: () -> Unit) {
         }
     }
 }
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true, heightDp = 800)
 @Composable
@@ -286,7 +298,7 @@ private fun HomeScreenPreview() {
     MaterialTheme {
         HomeScreen(
             uiState = HomeUiState(
-                topStar = TopStar(1, "Sirius", "Brightest star"),
+                topStar = TopStar("Sirius", "Sirius", "Brightest star"),
                 blogArticle = BlogArticle("01.01.2023", "Title", listOf("Content")),
                 events = listOf(
                     EventRow("Event 1", "Sub 1", "Time 1"),
