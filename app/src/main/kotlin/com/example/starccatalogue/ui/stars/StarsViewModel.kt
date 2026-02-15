@@ -13,9 +13,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.starccatalogue.network.StarOverview
+import com.example.starccatalogue.util.Bookmarks
 import com.example.starccatalogue.util.AndroidLogger
 
 data class StarUiState(
+    val id: Int = 0,
     val name: String = "",
     val scientificId: String = "",
     val magnitude: String = "",
@@ -23,11 +26,15 @@ data class StarUiState(
     val dec: String = "",
     val spectralClass: String = "",
     val distanceLightYears: String = "",
-    val isLoading: Boolean = true
+    val isLoading: Boolean = true,
+    val isBookmarked: Boolean = false
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
-class StarsViewModel(private val starId: String): ViewModel(){
+class StarsViewModel(
+    private val starId: String,
+    private val bookmarks: Bookmarks
+): ViewModel(){
     private val _starState: MutableStateFlow<StarUiState> = MutableStateFlow(StarUiState())
     val starState: StateFlow<StarUiState> = _starState.asStateFlow()
 
@@ -35,12 +42,22 @@ class StarsViewModel(private val starId: String): ViewModel(){
         loadData()
     }
 
-    companion object {
-        fun provideFactory(starId: String): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return StarsViewModel(starId) as T
-            }
+    fun toggleBookmark() {
+        val currentState = _starState.value
+        if (currentState.isLoading || currentState.name.isEmpty()) return
+
+        val overview = StarOverview(
+            oid = currentState.id,
+            name = currentState.name,
+            typ = currentState.spectralClass
+        )
+
+        if (currentState.isBookmarked) {
+            bookmarks.removeBookmark(currentState.id)
+            _starState.update { it.copy(isBookmarked = false) }
+        } else {
+            bookmarks.addBookmark(overview)
+            _starState.update { it.copy(isBookmarked = true) }
         }
     }
 
@@ -66,6 +83,7 @@ class StarsViewModel(private val starId: String): ViewModel(){
             if (table1 != null && table1.rowCount > 0L) {
                 val row = table1.getRow(0)
                 val oid = row[0]?.toString() ?: ""
+                val oidInt = oid.toIntOrNull() ?: 0
                 val mainIdRaw = row[1]?.toString() ?: ""
                 val raRaw = row[2]?.toString()?.toDoubleOrNull() ?: 0.0
                 val decRaw = row[3]?.toString()?.toDoubleOrNull() ?: 0.0
@@ -73,9 +91,13 @@ class StarsViewModel(private val starId: String): ViewModel(){
                 val plxRaw = row[5]?.toString()?.toDoubleOrNull()
                 val spType = row[6]?.toString() ?: ""
 
+                val isBookmarked = bookmarks.isBookmark(oidInt)
+
                 // Formatting Basic Data
                 val displayName = mainIdRaw
                     .replace(Regex("^(NAME|\\*|V\\*)\\s+"), "")
+
+
 
                 val magnitudeFormatted = String.format(Locale.US, "%.4f", magRaw)
                 val raFormatted = String.format(Locale.US, "%.4f", raRaw)
@@ -124,6 +146,7 @@ class StarsViewModel(private val starId: String): ViewModel(){
 
                 _starState.update {
                     StarUiState(
+                        id = oidInt,
                         name = finalName.ifEmpty { starId },
                         scientificId = scientificId,
                         magnitude = magnitudeFormatted,
@@ -131,7 +154,8 @@ class StarsViewModel(private val starId: String): ViewModel(){
                         dec = decFormatted,
                         spectralClass = spType,
                         distanceLightYears = distanceFormatted,
-                        isLoading = false
+                        isLoading = false,
+                        isBookmarked = isBookmarked
                     )
                 }
             } else {

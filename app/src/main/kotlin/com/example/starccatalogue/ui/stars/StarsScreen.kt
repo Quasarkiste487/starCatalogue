@@ -48,20 +48,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun StarsScreen(
     starId: String,
     onNavigateBack: () -> Unit,
-    viewModel: StarsViewModel = viewModel(factory = StarsViewModel.provideFactory(starId)),
+    viewModel: StarsViewModel = koinViewModel(parameters = { parametersOf(starId) }),
 ) {
     val starState by viewModel.starState.collectAsStateWithLifecycle()
     StarsScreen(
         starState = starState,
         onNavigateBack = onNavigateBack,
+        onBookmarkClick = viewModel::toggleBookmark
     )
 }
 
@@ -70,6 +73,7 @@ fun StarsScreen(
 private fun StarsScreen(
     starState: StarUiState,
     onNavigateBack: () -> Unit,
+    onBookmarkClick: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -85,9 +89,9 @@ private fun StarsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: Bookmark-Funktion */ }) {
+                    IconButton(onClick = onBookmarkClick) {
                         Icon(
-                            imageVector = Icons.Outlined.BookmarkBorder,
+                            imageVector = if (starState.isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
                             contentDescription = "Merken"
                         )
                     }
@@ -312,7 +316,8 @@ private fun StarsScreenPreview() {
             distanceLightYears = "8.60 ly",
             isLoading = false
         ),
-        onNavigateBack = {}
+        onNavigateBack = {},
+        onBookmarkClick = {}
     )
 }
 
@@ -323,6 +328,7 @@ private fun StarsScreenLoadingPreview() {
         starState = StarUiState(
             isLoading = true
         ),
-        onNavigateBack = {}
+        onNavigateBack = {},
+        onBookmarkClick = {}
     )
 }
