@@ -6,3 +6,4 @@ import kotlinx.serialization.Serializable
 data class ListR (
     val starName: String,
 )
+data class ListRoute(val searchQuery: String? = null)
