@@ -1,10 +1,8 @@
 package com.example.starccatalogue.network
 
-import android.net.http.NetworkException
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.annotation.RequiresExtension
 import com.example.starccatalogue.util.Logger
 import okhttp3.internal.connection.Exchange
 import uk.ac.starlink.table.StarTable
@@ -41,19 +39,16 @@ class Simbad (val logger : Logger, private val mirrorUrl : String = DEFAULT_MIRR
         }
         return null
     }
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun fetchData(queryScript: QueryScript): SimbadResponse? {
         // Build the complete URL with encoded script parameters
-        val requestUrl = "$mirrorUrl/sim-script?script=" + URLEncoder.encode(queryScript.build(), StandardCharsets.UTF_8)
+        val requestUrl = "$mirrorUrl/sim-script?script=" + URLEncoder.encode(queryScript.build(), "UTF-8")
         // Establish connection and get input stream from SIMBAD server
 
         return fetchData(URL(requestUrl))
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun fetchData(sqlQuery: String): SimbadResponse? {
-        val requestUrl = "$mirrorUrl/sim-tap/sync?request=doQuery&lang=adql&format=votable&query=" + URLEncoder.encode(sqlQuery,
-            StandardCharsets.UTF_8)
+        val requestUrl = "$mirrorUrl/sim-tap/sync?request=doQuery&lang=adql&format=votable&query=" + URLEncoder.encode(sqlQuery, "UTF-8")
         // println("URL: $requestUrl")
 
         return fetchData(URL(requestUrl))

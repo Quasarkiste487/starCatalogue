@@ -69,35 +69,39 @@ fun AppRoot() {
             modifier = Modifier.fillMaxSize(),
         ) {
             composable<HomeRoute> {
-                HomeScreen(
-                    onOpenDrawer = {
-                        scope.launch { drawerState.open() }
-                    },
-                    onSearch = { starName ->
-                        navController.navigate(ListR(starName))
-                    },
-                    onProfileClick = { starId ->
-                        navController.navigate(StarsRoute(starId))
-                    }
-                )
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    HomeScreen(
+                        onOpenDrawer = {
+                            scope.launch { drawerState.open() }
+                        },
+                        onSearch = { starName: String ->
+                            navController.navigate(ListR(starName))
+                        },
+                        onProfileClick = { starId: String ->
+                            navController.navigate(StarsRoute(starId))
+                        }
+                    )
+                }
             }
             composable<ListR> {
                 ListS(onUpClick = { navController.popBackStack() },
-                    onStarClick = { star ->
-                    navController.navigate(StarsRoute(star.toString()))
-                })
+                    onStarClick = { starId: Int ->
+                        navController.navigate(StarsRoute(starId.toString()))
+                    })
             }
             composable<StarsRoute> { backStackEntry ->
                 val route = backStackEntry.toRoute<StarsRoute>()
-                StarsScreen(
-                    starId = route.starId,
-                    onNavigateBack = { navController.popBackStack() })
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    StarsScreen(
+                        starId = route.starId,
+                        onNavigateBack = { navController.popBackStack() })
+                }
             }
             composable<BookmarkRoute> {
                 BookmarkScreen(
                     onUpClick = { navController.popBackStack()},
-                    onStarClick = { star ->
-                        navController.navigate(StarsRoute(star))
+                    onStarClick = { starId: Int ->
+                        navController.navigate(StarsRoute(starId.toString()))
                     }
                 )
             }
