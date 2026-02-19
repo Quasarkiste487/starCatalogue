@@ -21,6 +21,7 @@ data class BlogArticle(
 
 // Datenklasse für den Top-Stern
 data class TopStar(
+    val id: String, // Changed to String to match updated StarsRoute
     val name: String,
     val description: String
 )
@@ -32,6 +33,7 @@ data class HomeUiState(
     val topStar: TopStar? = null
 )
 
+// ViewModel welchen Daten für HomeScreen bereitstellt
 class HomeViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -42,37 +44,37 @@ class HomeViewModel : ViewModel() {
     }
 
     private fun loadData() {
-        // TODO: stern des tages laden, blog artikel und nächste events
         val events = listOf(
             EventRow(
                 title = "Sonnenfinsternis",
-                subtitle = "Description duis aute irure dolor in reprehenderit in voluptate velit.",
+                subtitle = "Totale Finsternis in Europa sichtbar.",
                 time = "Taggesamtzeit - 10:00"
             ),
             EventRow(
-                title = "Mars und Saturn stehen im Zwiespalt",
-                subtitle = "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                time = "Stundenhalbzeit - 10:30"
+                title = "Mars Opposition",
+                subtitle = "Mars steht der Sonne genau gegenüber.",
+                time = "Stundenhalbzeit - 22:30"
             ),
             EventRow(
-                title = "Pluto wird wieder Planet",
-                subtitle = "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                time = "Normalzeit - 13:37"
+                title = "Meteorstrom",
+                subtitle = "Die Perseiden erreichen ihr Maximum.",
+                time = "Nacht - 02:00"
             )
         )
 
-            val blogArticle = BlogArticle(
-                date = "15.07.2024",
-                title = "Aktuelle Beobachtungen",
-                paragraphs = listOf(
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-                    "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                )
+        val blogArticle = BlogArticle(
+            date = "15.07.2024",
+            title = "Aktuelle Beobachtungen",
+            paragraphs = listOf(
+                "In den kommenden Nächten lohnt sich ein Blick Richtung Süden. Der Skorpion steht hoch am Himmel und Antares funkelt rötlich.",
+                "Auch der Sommernachtshimmel bietet mit dem Sommerdreieck gute Orientierungshilfen für Einsteiger."
             )
+        )
 
         val topStar = TopStar(
+            id = "Sirius",
             name = "Sirius",
-            description = "so schön ja"
+            description = "Der hellste Stern am Nachthimmel."
         )
 
         _uiState.value = HomeUiState(

@@ -8,16 +8,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Menu
@@ -47,22 +46,23 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = viewModel(),
-    onProfileClick: () -> Unit = {},
-    onEventClick: (EventRow) -> Unit = {},
-    onOpenDrawer: () -> Unit = {},
-    onSearch: (String) -> Unit = {},
+    // Callback when a star profile is clicked
+    onProfileClick: (String) -> Unit, // Changed to String
+    onSearch: (String) -> Unit,
+    onOpenDrawer: () -> Unit,
+    viewModel: HomeViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeScreen(
         uiState = uiState,
         onProfileClick = onProfileClick,
-        onEventClick = onEventClick,
-        onOpenDrawer = onOpenDrawer,
-        onSearch = onSearch,
+        onEventClick = { /* TODO: navigation to event details */ },
+        onSearchClick = onSearch,
+        onOpenDrawer = onOpenDrawer
     )
 }
 
@@ -70,32 +70,48 @@ fun HomeScreen(
 @Composable
 private fun HomeScreen(
     uiState: HomeUiState,
-    onProfileClick: () -> Unit,
+    onProfileClick: (String) -> Unit, // Changed to String
     onEventClick: (EventRow) -> Unit,
-    onOpenDrawer: () -> Unit,
-    onSearch: (String) -> Unit,
+    onSearchClick: (String) -> Unit,
+    onOpenDrawer: () -> Unit
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        Column(
+        // Use LazyColumn as the specific scrolling container
+        LazyColumn(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
+                .fillMaxSize(),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SearchBar(onMenuClick = onOpenDrawer, onSearch = onSearch)
-            Spacer(Modifier.height(16.dp))
-            TopStarCard(
-                topStar = uiState.topStar, onProfileClick = onProfileClick
-            )
-            Spacer(Modifier.height(16.dp))
-            uiState.blogArticle?.let { article ->
-                BlogSection(article)
+            item {
+                SearchBar(onSearch = onSearchClick, onMenuClick = onOpenDrawer)
             }
-            Spacer(Modifier.height(16.dp))
-            EventsList(
-                events = uiState.events, onEventClick = onEventClick
-            )
+
+            item {
+                uiState.topStar?.let {
+                    TopStarCard(topStar = it, onProfileClick = onProfileClick)
+                }
+            }
+
+            item {
+                uiState.blogArticle?.let {
+                    BlogSection(article = it)
+                }
+            }
+
+            item {
+                Text(
+                    "Nächste Himmelsevent",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
+
+            items(uiState.events) { event ->
+                EventCard(event, onClick = { onEventClick(event) })
+            }
         }
     }
 }
@@ -104,8 +120,8 @@ private fun HomeScreen(
 private fun SearchBar(
     modifier: Modifier = Modifier,
     placeholder: String = "Sterne",
-    onMenuClick: () -> Unit = {},
-    onSearch: (String) -> Unit
+    onSearch: (String) -> Unit,
+    onMenuClick: () -> Unit
 ) {
     var value by remember { mutableStateOf("") }
     Surface(
@@ -149,9 +165,7 @@ private fun SearchBar(
 }
 
 @Composable
-private fun TopStarCard(
-    topStar: TopStar?, onProfileClick: () -> Unit
-) {
+private fun TopStarCard(topStar: TopStar, onProfileClick: (String) -> Unit) { // Changed to String
     Card(
         modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)
     ) {
@@ -180,7 +194,7 @@ private fun TopStarCard(
             ) {
                 // Name des Sterns groß oben
                 Text(
-                    text = topStar?.name ?: "Unbekannter Stern",
+                    text = topStar.name, // Use data from model
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Start
@@ -192,9 +206,8 @@ private fun TopStarCard(
                     color = Color.Gray,
                     textAlign = TextAlign.Start
                 )
-                // Beschreibung bleibt
                 Text(
-                    text = topStar?.description ?: "Keine Beschreibung vorhanden.",
+                    text = topStar.description,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray,
                     textAlign = TextAlign.Start
@@ -202,7 +215,7 @@ private fun TopStarCard(
                 Row(
                     modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                 ) {
-                    Button(onClick = onProfileClick) {
+                    Button(onClick = { onProfileClick(topStar.id) }) {
                         Text("zum Profil")
                     }
                 }
@@ -220,38 +233,13 @@ private fun BlogSection(article: BlogArticle) {
             modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(article.date, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
-            Text(
-                article.title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
+            Text(article.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             article.paragraphs.forEach { paragraph ->
                 Text(
                     paragraph,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF545454)
                 )
-            }
-        }
-    }
-}
-
-@Composable
-private fun EventsList(
-    events: List<EventRow>, onEventClick: (EventRow) -> Unit
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            "Nächste Himmelevents",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            events.forEach { event ->
-                EventCard(event, onClick = { onEventClick(event) })
             }
         }
     }
@@ -307,96 +295,20 @@ private fun EventCard(event: EventRow, onClick: () -> Unit) {
 @Preview(showBackground = true, heightDp = 800)
 @Composable
 private fun HomeScreenPreview() {
-    val previewState = HomeUiState(
-        events = listOf(
-            EventRow(
-                "Sonnenfinsternis",
-                "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                "Taggesamtzeit - 10:00"
-            ),
-            EventRow(
-                "Mars und Saturn stehen im Zwiespalt",
-                "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                "Stundenhalbzeit - 10:30"
-            ),
-            EventRow(
-                "Pluto wird wieder Planet",
-                "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                "Normalzeit - 13:37"
-            )
-        ), blogArticle = BlogArticle(
-            date = "15.07.2024", title = "Aktuelle Beobachtungen", paragraphs = listOf(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-            )
-        ), topStar = TopStar(
-            name = "Sirius", description = "so schön ja"
-        )
-    )
     MaterialTheme {
         HomeScreen(
-            uiState = previewState,
+            uiState = HomeUiState(
+                topStar = TopStar("sirius_star", "Sirius", "Brightest star"),
+                blogArticle = BlogArticle("01.01.2023", "Title", listOf("Content")),
+                events = listOf(
+                    EventRow("Event 1", "Sub 1", "Time 1"),
+                    EventRow("Event 2", "Sub 2", "Time 2")
+                )
+            ),
             onProfileClick = {},
             onEventClick = {},
-            onOpenDrawer = {},
-            onSearch = {},
+            onSearchClick = {},
+            onOpenDrawer = {}
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SearchBarPreview() {
-    MaterialTheme {
-        Box(modifier = Modifier.background(Color.White)) {
-            SearchBar(
-                modifier = Modifier.padding(16.dp), onMenuClick = {}, onSearch = {})
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TopStarCardPreview() {
-    val topStar = TopStar(
-        name = "Sirius", description = "so schön ja"
-    )
-    MaterialTheme { TopStarCard(topStar = topStar, onProfileClick = {}) }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun BlogSectionPreview() {
-    val article = BlogArticle(
-        date = "15.07.2024", title = "Aktuelle Beobachtungen", paragraphs = listOf(
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-        )
-    )
-    MaterialTheme { BlogSection(article) }
-}
-
-@Preview(showBackground = true, heightDp = 420)
-@Composable
-private fun EventsListPreview() {
-    MaterialTheme {
-        EventsList(
-            events = listOf(
-                EventRow(
-                    "Sonnenfinsternis",
-                    "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                    "Taggesamtzeit - 10:00"
-                ),
-                EventRow(
-                    "Mars und Saturn stehen im Zwiespalt",
-                    "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                    "Stundenhalbzeit - 10:30"
-                ),
-                EventRow(
-                    "Pluto wird wieder Planet",
-                    "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                    "Normalzeit - 13:37"
-                )
-            ), onEventClick = {})
     }
 }

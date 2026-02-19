@@ -13,6 +13,7 @@ import com.example.starccatalogue.util.Bookmarks
 import com.example.starccatalogue.util.Logger
 import com.squareup.moshi.Moshi
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -20,7 +21,7 @@ import org.koin.dsl.module
 val AppModule = module {
     viewModelOf(::HomeViewModel)
     viewModelOf(::ListVM)
-    viewModelOf(::StarsViewModel)
+    viewModel { (starId: String) -> StarsViewModel(starId, get()) }
     viewModelOf(::BookmarkViewModel)
 
     single { Moshi.Builder().build() }
