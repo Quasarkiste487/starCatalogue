@@ -3,7 +3,6 @@ package com.example.starccatalogue.ui.stars
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.starccatalogue.network.Simbad
 import java.util.Locale
