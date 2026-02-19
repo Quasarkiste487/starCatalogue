@@ -96,8 +96,6 @@ class StarsViewModel(
                 val displayName = mainIdRaw
                     .replace(Regex("^(NAME|\\*|V\\*)\\s+"), "")
 
-
-
                 val magnitudeFormatted = String.format(Locale.US, "%.4f", magRaw)
                 val raFormatted = String.format(Locale.US, "%.4f", raRaw)
                 val decFormatted = String.format(Locale.US, "%.4f", decRaw)
