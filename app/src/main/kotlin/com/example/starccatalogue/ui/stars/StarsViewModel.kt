@@ -112,9 +112,10 @@ class StarsViewModel(
                 // STEP 2: Now that we have the OID, fetch ALL identifiers to find the Scientific Name (HIP/HD)
                 var scientificId = ""
                 var commonName = "" // Used for finding name like "Sirius" if Step 1 gave "alf CMa"
+                val simbad = Simbad(logger)
                 if (oid.isNotEmpty()) {
                     val queryStep2 = "SELECT id FROM ident WHERE oidref = $oid"
-                    val response2 = Simbad(logger).fetchData(queryStep2)
+                    val response2 = simbad.fetchData(queryStep2)
                     val table2 = response2?.buildStarTable()
 
                     if (table2 != null) {
