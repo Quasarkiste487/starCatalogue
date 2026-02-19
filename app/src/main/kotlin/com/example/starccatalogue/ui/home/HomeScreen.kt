@@ -298,7 +298,7 @@ private fun HomeScreenPreview() {
     MaterialTheme {
         HomeScreen(
             uiState = HomeUiState(
-                topStar = TopStar("Sirius", "Sirius", "Brightest star"),
+                topStar = TopStar("sirius_star", "Sirius", "Brightest star"),
                 blogArticle = BlogArticle("01.01.2023", "Title", listOf("Content")),
                 events = listOf(
                     EventRow("Event 1", "Sub 1", "Time 1"),
