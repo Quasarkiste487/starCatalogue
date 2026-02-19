@@ -110,8 +110,8 @@ class StarsViewModel(
                 var scientificId = ""
                 var commonName = "" // Used for finding name like "Sirius" if Step 1 gave "alf CMa"
                 val simbad = Simbad(logger)
-                if (oid.isNotEmpty()) {
-                    val queryStep2 = "SELECT id FROM ident WHERE oidref = $oid"
+                if (oidInt > 0) {
+                    val queryStep2 = "SELECT id FROM ident WHERE oidref = $oidInt"
                     val response2 = simbad.fetchData(queryStep2)
                     val table2 = response2?.buildStarTable()
 
