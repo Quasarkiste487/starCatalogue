@@ -77,8 +77,8 @@ fun AppRoot() {
                         onSearch = { starName: String ->
                             navController.navigate(ListR(starName))
                         },
-                        onProfileClick = { starId: String ->
-                            navController.navigate(StarsRoute(starId))
+                        onProfileClick = {
+                            navController.navigate(StarsRoute("Sirius"))
                         }
                     )
                 }

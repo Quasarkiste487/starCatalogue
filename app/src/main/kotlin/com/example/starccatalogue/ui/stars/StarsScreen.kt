@@ -21,12 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.Explore
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.LightMode
-import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -91,7 +90,7 @@ private fun StarsScreen(
                 actions = {
                     IconButton(onClick = onBookmarkClick) {
                         Icon(
-                            imageVector = if (starState.isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                            imageVector = if (starState.isBookmarked) Icons.Filled.Bookmark else Icons.Filled.FavoriteBorder,
                             contentDescription = "Merken"
                         )
                     }
@@ -191,11 +190,11 @@ private fun DataCardsSection(
         )
 
         // Scientific Identifier Card
-        if (starState.scientificId.isNotEmpty()) {
+        if (starState.scientificId.isNotEmpty() && !starState.scientificId.startsWith("NAME")) {
             DataCard(
                 label = "Scientific Name",
                 value = starState.scientificId,
-                icon = Icons.Outlined.LightMode
+                icon = Icons.Filled.Info
             )
         }
 
@@ -216,7 +215,7 @@ private fun DataCardsSection(
                 DataCard(
                     label = "RA",
                     value = starState.ra,
-                    icon = Icons.Outlined.MyLocation,
+                    icon = Icons.Filled.Place,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -227,7 +226,7 @@ private fun DataCardsSection(
             DataCard(
                 label = "Declination",
                 value = starState.dec,
-                icon = Icons.Outlined.Explore
+                icon = Icons.Filled.Place
             )
         }
 
@@ -236,7 +235,7 @@ private fun DataCardsSection(
              DataCard(
                 label = "Distanz",
                 value = starState.distanceLightYears,
-                icon = Icons.Outlined.Explore // Or appropriate icon
+                icon = Icons.Filled.Place // Or appropriate icon
             )
         }
 
@@ -245,7 +244,7 @@ private fun DataCardsSection(
              DataCard(
                 label = "Spektralklasse",
                 value = starState.spectralClass,
-                icon = Icons.Outlined.Info
+                icon = Icons.Filled.Info
             )
         }
     }
