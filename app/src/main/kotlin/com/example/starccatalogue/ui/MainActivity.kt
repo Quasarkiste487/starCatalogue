@@ -135,15 +135,7 @@ fun AppRoot() {
             modifier = Modifier.padding(paddingValues),
         ) {
             composable<HomeRoute> {
-                HomeScreen(onSearch = { starName ->
-                    navController.navigate(ListR(starName)) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = false
-                    }
-                }, onProfileClick = { starId ->
+                HomeScreen(onProfileClick = { starId ->
                     navController.navigate(StarsRoute(starId))
                 })
             }

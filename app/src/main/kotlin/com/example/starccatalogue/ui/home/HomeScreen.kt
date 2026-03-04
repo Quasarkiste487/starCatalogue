@@ -19,23 +19,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,18 +44,13 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
     onProfileClick: (Int) -> Unit = {},
     onEventClick: (EventRow) -> Unit = {},
-    onSearch: (String) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     HomeScreen(
         uiState = uiState,
-        searchQuery = searchQuery,
-        onSearchQueryChange = viewModel::updateSearchQuery,
         onProfileClick = onProfileClick,
         onEventClick = onEventClick,
-        onSearch = onSearch,
     )
 }
 
@@ -67,11 +58,8 @@ fun HomeScreen(
 @Composable
 private fun HomeScreen(
     uiState: HomeUiState,
-    searchQuery: String,
-    onSearchQueryChange: (String) -> Unit,
     onProfileClick: (Int) -> Unit,
     onEventClick: (EventRow) -> Unit,
-    onSearch: (String) -> Unit,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -81,30 +69,6 @@ private fun HomeScreen(
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
         ) {
-            Text(
-                text = "Stars in your hand",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Light,
-                textAlign = TextAlign.Center,
-                fontStyle = FontStyle.Italic,
-                modifier = Modifier.fillMaxWidth()
-            )
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = onSearchQueryChange,
-                onSearch = { onSearch(it) },
-                active = false,
-                onActiveChange = {},
-                placeholder = { Text("Sterne suchen...") },
-                trailingIcon = {
-                    IconButton(onClick = { onSearch(searchQuery) }) {
-                        Icon(Icons.Filled.Search, contentDescription = "Suchen")
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp)
-            ) { }
             TopStarCard(
                 topStar = uiState.topStar, onProfileClick = onProfileClick
             )
@@ -306,31 +270,9 @@ private fun HomeScreenPreview() {
     MaterialTheme {
         HomeScreen(
             uiState = previewState,
-            searchQuery = "Sirius",
-            onSearchQueryChange = {},
             onProfileClick = {},
             onEventClick = {},
-            onSearch = {},
         )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
-@Composable
-private fun SearchBarPreview() {
-    MaterialTheme {
-        Box(modifier = Modifier.background(Color.White)) {
-            SearchBar(
-                query = "Sirius",
-                onQueryChange = {},
-                onSearch = {},
-                active = false,
-                onActiveChange = {},
-                placeholder = { Text("Sterne suchen...") },
-                modifier = Modifier.padding(16.dp)
-            ) {}
-        }
     }
 }
 
