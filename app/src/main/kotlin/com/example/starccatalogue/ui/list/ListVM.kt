@@ -8,15 +8,19 @@ import com.example.starccatalogue.network.Ordering
 import com.example.starccatalogue.network.StarDataSource
 import com.example.starccatalogue.network.StarOverview
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(FlowPreview::class)
 class ListVM(
     savedStateHandle: SavedStateHandle, private val starSource: StarDataSource
 ) : ViewModel() {
@@ -31,7 +35,7 @@ class ListVM(
 
     init {
         viewModelScope.launch {
-            searchQuery.collect { query ->
+            searchQuery.debounce(1000.milliseconds).collect { query ->
                 loadData(query)
             }
         }
