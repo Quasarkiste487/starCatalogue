@@ -24,17 +24,17 @@ class ExampleUnitTest {
         val logger = com.example.starccatalogue.util.StdoutLogger()
 
         val script = QueryScript(10, listOf("main_id", "ra", "dec", "flux(V)"), "Vmag < 6")
-        var raw : SimbadResponse?
+        var raw: SimbadResponse?
         println("fetched data in: " + measureTime {
             raw = Simbad(logger).fetchData(script)
         })
 
-        if (raw == null){
+        if (raw == null) {
             return
         }
 
         println(raw.getHeaderMetadata())
-        var table : StarTable
+        var table: StarTable
         println("built table in: " + measureTime {
             table = raw.buildStarTable()
         })
@@ -43,7 +43,7 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun fetchStardataSQL(){
+    fun fetchStardataSQL() {
         val query = """
         SELECT TOP 100 oidref, id from ident
         JOIN allfluxes using(oidref)
@@ -52,15 +52,15 @@ class ExampleUnitTest {
 
         val logger = com.example.starccatalogue.util.StdoutLogger()
 
-        var raw : SimbadResponse?
+        var raw: SimbadResponse?
         println("fetched data in: " + measureTime {
             raw = Simbad(logger).fetchData(query)
         })
-        if (raw == null){
+        if (raw == null) {
             return
         }
         println(raw.getHeaderMetadata())
-        var table : StarTable
+        var table: StarTable
         println("built table in: " + measureTime {
             table = raw.buildStarTable()
         })
@@ -69,14 +69,13 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun fetchDataRepo(){
+    fun fetchDataRepo() {
         val logger = com.example.starccatalogue.util.StdoutLogger()
 
         val repo = SimbadSQLSource(Simbad(logger))
-        val result = repo.listStarsRequest()
-            .limit(10)
-            .filter("ident", Filter.like("id", "NAME %Sirius%"))
-            .fetch()
+        val result =
+            repo.listStarsRequest().limit(10).filter("ident", Filter.like("id", "NAME %Sirius%"))
+                .fetch()
         result.forEach { println(it) }
 
         val first = repo.getStarDetails(result[0].oid)

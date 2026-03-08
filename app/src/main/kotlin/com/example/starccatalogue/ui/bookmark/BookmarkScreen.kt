@@ -40,13 +40,11 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun BookmarkScreen (
     onStarClick: (Int) -> Unit,
-    onUpClick: () -> Unit,
     viewModel: BookmarkViewModel = koinViewModel(),
 ) {
     val stars by viewModel.starList.collectAsStateWithLifecycle()
     BookmarkScreen(
         stars = stars,
-        onUpClick = onUpClick,
         onStarClick = onStarClick,
     )
 
@@ -56,21 +54,12 @@ fun BookmarkScreen (
 @Composable
 private fun BookmarkScreen(
     stars: List<StarOverview>,
-    onUpClick: () -> Unit,
     onStarClick: (Int) -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             CenterAlignedTopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = onUpClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Zurück",
-                        )
-                    }
-                },
                 title = {
                     Text("Lesezeichen")
                 },
