@@ -39,20 +39,20 @@ import com.example.starccatalogue.ui.list.ListR
 import com.example.starccatalogue.ui.list.ListS
 import com.example.starccatalogue.ui.settings.SettingsRoute
 import com.example.starccatalogue.ui.settings.SettingsScreen
-import com.example.starccatalogue.ui.settings.SettingsViewModel
 import com.example.starccatalogue.ui.stars.StarsRoute
 import com.example.starccatalogue.ui.stars.StarsScreen
 import com.example.starccatalogue.ui.theme.StarcCatalogueTheme
+import com.example.starccatalogue.util.Settings
 import com.example.starccatalogue.util.ThemeMode
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val settingsViewModel: SettingsViewModel = koinViewModel()
-            val settingsState by settingsViewModel.settingsState.collectAsStateWithLifecycle()
+            val settings: Settings = koinInject()
+            val settingsState by settings.settingsFlow.collectAsStateWithLifecycle()
             val systemDark = isSystemInDarkTheme()
             val darkTheme = when (settingsState.themeMode) {
                 ThemeMode.LIGHT  -> false
