@@ -1,6 +1,8 @@
 package com.example.starccatalogue.util
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
@@ -11,6 +13,7 @@ import java.io.File
 
 enum class ThemeMode { LIGHT, DARK, SYSTEM }
 enum class AppLanguage(val displayName: String, val code: String) {
+    SYSTEM("System", ""),
     GERMAN("Deutsch", "de"),
     ENGLISH("English", "en"),
     FRENCH("Français", "fr"),
@@ -21,13 +24,14 @@ enum class AppLanguage(val displayName: String, val code: String) {
 @JsonClass(generateAdapter = true)
 data class SettingsData(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val language: AppLanguage = AppLanguage.GERMAN
+    val language: AppLanguage = AppLanguage.SYSTEM
 )
 
 interface Settings {
     val settingsFlow: StateFlow<SettingsData>
     fun setThemeMode(mode: ThemeMode)
     fun setLanguage(language: AppLanguage)
+    fun applyLanguage()
 }
 
 class SettingsManager(
@@ -78,6 +82,16 @@ class SettingsManager(
 
     override fun setLanguage(language: AppLanguage) {
         persist(current.copy(language = language))
+        applyLanguage()
+    }
+
+    override fun applyLanguage() {
+        val localeList = if (current.language == AppLanguage.SYSTEM || current.language.code.isEmpty()) {
+            LocaleListCompat.getEmptyLocaleList()
+        } else {
+            LocaleListCompat.forLanguageTags(current.language.code)
+        }
+        AppCompatDelegate.setApplicationLocales(localeList)
+        logger.i("SettingsManager", "Applied language: ${current.language.code.ifEmpty { "system" }}")
     }
 }
-

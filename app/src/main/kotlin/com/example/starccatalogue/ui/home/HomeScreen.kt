@@ -32,12 +32,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.starccatalogue.R
 
 @Composable
 fun HomeScreen(
@@ -116,21 +118,21 @@ private fun TopStarCard(
             ) {
                 // Name des Sterns groß oben
                 Text(
-                    text = topStar?.name ?: "Unbekannter Stern",
+                    text = topStar?.name ?: stringResource(R.string.unknown_star),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Start
                 )
                 // "Top Stern" darunter als Untertitel
                 Text(
-                    text = "Heutiger Top Stern",
+                    text = stringResource(R.string.top_star_today),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray,
                     textAlign = TextAlign.Start
                 )
                 // Beschreibung bleibt
                 Text(
-                    text = topStar?.description ?: "Keine Beschreibung vorhanden.",
+                    text = topStar?.descriptionRes?.let { stringResource(it) } ?: stringResource(R.string.no_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray,
                     textAlign = TextAlign.Start
@@ -139,7 +141,7 @@ private fun TopStarCard(
                     modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                 ) {
                     Button(onClick = { topStar?.id?.let { onProfileClick(it) } }) {
-                        Text("zum Profil")
+                        Text(stringResource(R.string.to_profile))
                     }
                 }
             }
@@ -157,13 +159,13 @@ private fun BlogSection(article: BlogArticle) {
         ) {
             Text(article.date, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
             Text(
-                article.title,
+                stringResource(article.titleRes),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
-            article.paragraphs.forEach { paragraph ->
+            article.paragraphRes.forEach { paragraphRes ->
                 Text(
-                    paragraph,
+                    stringResource(paragraphRes),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF545454)
                 )
@@ -178,7 +180,7 @@ private fun EventsList(
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            "Nächste Himmelevents",
+            stringResource(R.string.upcoming_sky_events),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -223,12 +225,12 @@ private fun EventCard(event: EventRow, onClick: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    event.title,
+                    stringResource(event.titleRes),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold
                 )
-                Text(event.subtitle, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                Text(event.time, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                Text(stringResource(event.subtitleRes), style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                Text(stringResource(event.timeRes), style = MaterialTheme.typography.labelSmall, color = Color.Gray)
             }
             Icon(
                 imageVector = Icons.Filled.ChevronRight,
@@ -246,25 +248,30 @@ private fun HomeScreenPreview() {
     val previewState = HomeUiState(
         events = listOf(
             EventRow(
-                "Sonnenfinsternis",
-                "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                "Taggesamtzeit - 10:00"
-            ), EventRow(
-                "Mars und Saturn stehen im Zwiespalt",
-                "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                "Stundenhalbzeit - 10:30"
-            ), EventRow(
-                "Pluto wird wieder Planet",
-                "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                "Normalzeit - 13:37"
+                titleRes = R.string.event_1_title,
+                subtitleRes = R.string.event_1_subtitle,
+                timeRes = R.string.event_1_time
+            ),
+            EventRow(
+                titleRes = R.string.event_2_title,
+                subtitleRes = R.string.event_2_subtitle,
+                timeRes = R.string.event_2_time
+            ),
+            EventRow(
+                titleRes = R.string.event_3_title,
+                subtitleRes = R.string.event_3_subtitle,
+                timeRes = R.string.event_3_time
             )
-        ), blogArticle = BlogArticle(
-            date = "15.07.2024", title = "Aktuelle Beobachtungen", paragraphs = listOf(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-            )
-        ), topStar = TopStar(
-            id = 8399845, name = "Sirius", description = "so schön ja"
+        ),
+        blogArticle = BlogArticle(
+            date = "15.07.2024",
+            titleRes = R.string.blog_title,
+            paragraphRes = listOf(R.string.blog_paragraph_1, R.string.blog_paragraph_2)
+        ),
+        topStar = TopStar(
+            id = 8399845,
+            name = "Sirius",
+            descriptionRes = R.string.top_star_description
         )
     )
     MaterialTheme {
@@ -280,7 +287,9 @@ private fun HomeScreenPreview() {
 @Composable
 private fun TopStarCardPreview() {
     val topStar = TopStar(
-        id = 8399845, name = "Sirius", description = "so schön ja"
+        id = 8399845,
+        name = "Sirius",
+        descriptionRes = R.string.top_star_description
     )
     MaterialTheme { TopStarCard(topStar = topStar, onProfileClick = {}) }
 }
@@ -289,10 +298,9 @@ private fun TopStarCardPreview() {
 @Composable
 private fun BlogSectionPreview() {
     val article = BlogArticle(
-        date = "15.07.2024", title = "Aktuelle Beobachtungen", paragraphs = listOf(
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-        )
+        date = "15.07.2024",
+        titleRes = R.string.blog_title,
+        paragraphRes = listOf(R.string.blog_paragraph_1, R.string.blog_paragraph_2)
     )
     MaterialTheme { BlogSection(article) }
 }
@@ -304,18 +312,22 @@ private fun EventsListPreview() {
         EventsList(
             events = listOf(
                 EventRow(
-                    "Sonnenfinsternis",
-                    "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                    "Taggesamtzeit - 10:00"
-                ), EventRow(
-                    "Mars und Saturn stehen im Zwiespalt",
-                    "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                    "Stundenhalbzeit - 10:30"
-                ), EventRow(
-                    "Pluto wird wieder Planet",
-                    "Description duis aute irure dolor in reprehenderit in voluptate velit.",
-                    "Normalzeit - 13:37"
+                    titleRes = R.string.event_1_title,
+                    subtitleRes = R.string.event_1_subtitle,
+                    timeRes = R.string.event_1_time
+                ),
+                EventRow(
+                    titleRes = R.string.event_2_title,
+                    subtitleRes = R.string.event_2_subtitle,
+                    timeRes = R.string.event_2_time
+                ),
+                EventRow(
+                    titleRes = R.string.event_3_title,
+                    subtitleRes = R.string.event_3_subtitle,
+                    timeRes = R.string.event_3_time
                 )
-            ), onEventClick = {})
+            ),
+            onEventClick = {}
+        )
     }
 }

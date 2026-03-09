@@ -1,7 +1,5 @@
 package com.example.starccatalogue.ui.stars
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
@@ -44,11 +42,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.starccatalogue.R
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -80,7 +80,7 @@ private fun StarsScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Zurück"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -88,7 +88,7 @@ private fun StarsScreen(
                     IconButton(onClick = onToggleBookmark) {
                         Icon(
                             imageVector = if (starState.isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                            contentDescription = if (starState.isBookmarked) "Bookmark entfernen" else "Bookmark hinzufügen"
+                            contentDescription = if (starState.isBookmarked) stringResource(R.string.remove_bookmark) else stringResource(R.string.add_bookmark)
                         )
                     }
                 },
@@ -165,7 +165,7 @@ private fun HeroSection(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Magnitude ${starState.magnitude}",
+                    text = stringResource(R.string.magnitude_label, starState.magnitude),
                     style = MaterialTheme.typography.headlineSmall,
                     color = Color(0xFFE1BEE7), // Light purple
                     textAlign = TextAlign.Center
@@ -187,7 +187,7 @@ private fun DataCardsSection(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Basisdaten",
+            text = stringResource(R.string.base_data),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -195,7 +195,7 @@ private fun DataCardsSection(
 
         // ID Card
         DataCard(
-            label = "Identifier",
+            label = stringResource(R.string.identifier),
             value = starState.name,
             icon = Icons.Outlined.LightMode
         )
@@ -206,13 +206,13 @@ private fun DataCardsSection(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
                 DataCard(
-                    label = "Declination",
+                    label = stringResource(R.string.declination),
                     value = starState.dec.toString(),
                     icon = Icons.Filled.Star,
                     modifier = Modifier.weight(1f)
                 )
                 DataCard(
-                    label = "Right Ascension",
+                    label = stringResource(R.string.right_ascension),
                     value = starState.ra.toString(),
                     icon = Icons.Outlined.MyLocation,
                     modifier = Modifier.weight(1f)
@@ -220,7 +220,7 @@ private fun DataCardsSection(
         }
 
         DataCard(
-            label = "Magnitude",
+            label = stringResource(R.string.magnitude),
             value = starState.magnitude.toString(),
             icon = Icons.Outlined.Explore
         )

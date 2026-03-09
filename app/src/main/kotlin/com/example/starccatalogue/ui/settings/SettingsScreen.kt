@@ -9,8 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.starccatalogue.R
 import com.example.starccatalogue.util.AppLanguage
 import com.example.starccatalogue.util.ThemeMode
 import org.koin.compose.viewmodel.koinViewModel
@@ -30,23 +32,23 @@ fun SettingsScreen(
         AlertDialog(
             onDismissRequest = { showClearDialog = false },
             icon = { Icon(Icons.Default.DeleteForever, contentDescription = null) },
-            title = { Text("Lesezeichen zurücksetzen") },
-            text = { Text("Alle Lesezeichen werden unwiderruflich gelöscht. Fortfahren?") },
+            title = { Text(stringResource(R.string.reset_bookmarks_dialog_title)) },
+            text = { Text(stringResource(R.string.reset_bookmarks_dialog_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.clearBookmarks()
                     showClearDialog = false
-                }) { Text("Löschen", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
-                TextButton(onClick = { showClearDialog = false }) { Text("Abbrechen") }
+                TextButton(onClick = { showClearDialog = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Einstellungen") })
+            TopAppBar(title = { Text(stringResource(R.string.settings_title)) })
         }
     ) { paddingValues ->
         Column(
@@ -59,31 +61,26 @@ fun SettingsScreen(
         ) {
 
             // ── Erscheinungsbild ─────────────────────────────────────────────
-            SettingsSection(title = "Erscheinungsbild", icon = Icons.Default.Palette) {
+            SettingsSection(title = stringResource(R.string.appearance), icon = Icons.Default.Palette) {
                 Text(
-                    text = "Farbschema",
+                    text = stringResource(R.string.color_scheme),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                     val modes = listOf(
-                        ThemeMode.LIGHT to "Hell",
-                        ThemeMode.SYSTEM to "System",
-                        ThemeMode.DARK  to "Dunkel"
+                        Triple(ThemeMode.LIGHT, stringResource(R.string.theme_light), Icons.Default.LightMode),
+                        Triple(ThemeMode.SYSTEM, stringResource(R.string.theme_system), Icons.Default.BrightnessAuto),
+                        Triple(ThemeMode.DARK, stringResource(R.string.theme_dark), Icons.Default.DarkMode)
                     )
-                    modes.forEachIndexed { index, (mode, label) ->
+                    modes.forEachIndexed { index, (mode, label, icon) ->
                         SegmentedButton(
                             shape = SegmentedButtonDefaults.itemShape(index, modes.size),
                             onClick = { viewModel.setThemeMode(mode) },
                             selected = state.themeMode == mode,
                             label = { Text(label) },
                             icon = {
-                                val icon = when (mode) {
-                                    ThemeMode.LIGHT  -> Icons.Default.LightMode
-                                    ThemeMode.DARK   -> Icons.Default.DarkMode
-                                    ThemeMode.SYSTEM -> Icons.Default.BrightnessAuto
-                                }
                                 SegmentedButtonDefaults.Icon(active = state.themeMode == mode) {
                                     Icon(icon, contentDescription = null, modifier = Modifier.size(SegmentedButtonDefaults.IconSize))
                                 }
@@ -94,16 +91,16 @@ fun SettingsScreen(
             }
 
             // ── Sprache ──────────────────────────────────────────────────────
-            SettingsSection(title = "Sprache", icon = Icons.Default.Language) {
+            SettingsSection(title = stringResource(R.string.language), icon = Icons.Default.Language) {
                 ExposedDropdownMenuBox(
                     expanded = languageExpanded,
                     onExpandedChange = { languageExpanded = it }
                 ) {
                     OutlinedTextField(
-                        value = state.language.displayName,
+                        value = getLanguageDisplayName(state.language),
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Sprache auswählen") },
+                        label = { Text(stringResource(R.string.select_language)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -115,7 +112,7 @@ fun SettingsScreen(
                     ) {
                         AppLanguage.entries.forEach { lang ->
                             DropdownMenuItem(
-                                text = { Text(lang.displayName) },
+                                text = { Text(getLanguageDisplayName(lang)) },
                                 onClick = {
                                     viewModel.setLanguage(lang)
                                     languageExpanded = false
@@ -132,7 +129,7 @@ fun SettingsScreen(
             }
 
             // ── Lesezeichen ──────────────────────────────────────────────────
-            SettingsSection(title = "Lesezeichen", icon = Icons.Default.Bookmark) {
+            SettingsSection(title = stringResource(R.string.bookmarks_section), icon = Icons.Default.Bookmark) {
                 OutlinedButton(
                     onClick = { showClearDialog = true },
                     modifier = Modifier.fillMaxWidth(),
@@ -146,13 +143,13 @@ fun SettingsScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Lesezeichen zurücksetzen")
+                    Text(stringResource(R.string.reset_bookmarks))
                 }
             }
 
             // ── Über die App ─────────────────────────────────────────────────
             SettingsSection(
-                title = "Über die App",
+                title = stringResource(R.string.about_app),
                 icon = Icons.Default.Info,
                 trailingAction = {
                     IconButton(onClick = { showAbout = !showAbout }) {
@@ -165,21 +162,29 @@ fun SettingsScreen(
             ) {
                 if (showAbout) {
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        AboutRow(label = "App", value = "Star Catalogue")
-                        AboutRow(label = "Version", value = "1.0.0")
-                        AboutRow(
-                            label = "Beschreibung",
-                            value = "Durchsuche und erkunde Sterne aus dem SIMBAD-Katalog. " +
-                                    "Speichere Favoriten als Lesezeichen und passe die App nach deinen Wünschen an."
-                        )
-                        AboutRow(label = "Entwickelt an", value = "HTWK Leipzig")
-                        AboutRow(label = "Semester", value = "5. Semester – Mobile Computing")
+                        AboutRow(label = stringResource(R.string.about_app_name), value = stringResource(R.string.about_app_name_value))
+                        AboutRow(label = stringResource(R.string.about_version), value = stringResource(R.string.about_version_value))
+                        AboutRow(label = stringResource(R.string.about_description), value = stringResource(R.string.about_description_value))
+                        AboutRow(label = stringResource(R.string.about_developed_at), value = stringResource(R.string.about_developed_at_value))
+                        AboutRow(label = stringResource(R.string.about_semester), value = stringResource(R.string.about_semester_value))
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
         }
+    }
+}
+
+@Composable
+private fun getLanguageDisplayName(language: AppLanguage): String {
+    return when (language) {
+        AppLanguage.SYSTEM -> stringResource(R.string.theme_system)
+        AppLanguage.GERMAN -> stringResource(R.string.lang_german)
+        AppLanguage.ENGLISH -> stringResource(R.string.lang_english)
+        AppLanguage.FRENCH -> stringResource(R.string.lang_french)
+        AppLanguage.SPANISH -> stringResource(R.string.lang_spanish)
+        AppLanguage.ITALIAN -> stringResource(R.string.lang_italian)
     }
 }
 
