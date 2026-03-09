@@ -7,6 +7,7 @@ import com.example.starccatalogue.util.Bookmarks
 import com.example.starccatalogue.util.Settings
 import com.example.starccatalogue.util.SettingsData
 import com.example.starccatalogue.util.ThemeMode
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -33,7 +34,9 @@ class SettingsViewModel(
     }
 
     fun clearBookmarks() {
-        bookmarks.clearBookmarks()
+        viewModelScope.launch(Dispatchers.IO) {
+            bookmarks.clearBookmarks()
+        }
     }
 }
 

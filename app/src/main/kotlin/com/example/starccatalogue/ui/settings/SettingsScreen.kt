@@ -9,11 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.starccatalogue.BuildConfig
 import com.example.starccatalogue.R
 import com.example.starccatalogue.util.AppLanguage
 import com.example.starccatalogue.util.ThemeMode
@@ -25,14 +25,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     val state by viewModel.settingsState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    val versionName = remember {
-        try {
-            context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.0"
-        } catch (_: Exception) {
-            "1.0"
-        }
-    }
+    val versionName = remember { BuildConfig.VERSION_NAME }
 
     val (showClearDialog, setShowClearDialog) = remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
@@ -41,7 +34,7 @@ fun SettingsScreen(
     if (showClearDialog) {
         AlertDialog(
             onDismissRequest = { setShowClearDialog(false) },
-            icon = { Icon(Icons.Default.DeleteForever, contentDescription = null) },
+            icon = { Icon(Icons.Default.DeleteForever, contentDescription = stringResource(R.string.cd_delete_forever)) },
             title = { Text(stringResource(R.string.reset_bookmarks_dialog_title)) },
             text = { Text(stringResource(R.string.reset_bookmarks_dialog_message)) },
             confirmButton = {
@@ -71,7 +64,7 @@ fun SettingsScreen(
         ) {
 
             // ── Erscheinungsbild ─────────────────────────────────────────────
-            SettingsSection(title = stringResource(R.string.appearance), icon = Icons.Default.Palette) {
+            SettingsSection(title = stringResource(R.string.appearance), icon = Icons.Default.Palette, iconContentDescription = stringResource(R.string.cd_appearance)) {
                 Text(
                     text = stringResource(R.string.color_scheme),
                     style = MaterialTheme.typography.bodyMedium,
@@ -79,12 +72,16 @@ fun SettingsScreen(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                    val lightModeDesc = stringResource(R.string.cd_light_mode)
+                    val systemModeDesc = stringResource(R.string.cd_system_mode)
+                    val darkModeDesc = stringResource(R.string.cd_dark_mode)
                     val modes = listOf(
-                        Triple(ThemeMode.LIGHT, stringResource(R.string.theme_light), Icons.Default.LightMode),
-                        Triple(ThemeMode.SYSTEM, stringResource(R.string.theme_system), Icons.Default.BrightnessAuto),
-                        Triple(ThemeMode.DARK, stringResource(R.string.theme_dark), Icons.Default.DarkMode)
+                        Triple(ThemeMode.LIGHT, stringResource(R.string.theme_light), Icons.Default.LightMode to lightModeDesc),
+                        Triple(ThemeMode.SYSTEM, stringResource(R.string.theme_system), Icons.Default.BrightnessAuto to systemModeDesc),
+                        Triple(ThemeMode.DARK, stringResource(R.string.theme_dark), Icons.Default.DarkMode to darkModeDesc)
                     )
-                    modes.forEachIndexed { index, (mode, label, icon) ->
+                    modes.forEachIndexed { index, (mode, label, iconPair) ->
+                        val (icon, iconDesc) = iconPair
                         SegmentedButton(
                             shape = SegmentedButtonDefaults.itemShape(index, modes.size),
                             onClick = { viewModel.setThemeMode(mode) },
@@ -92,7 +89,7 @@ fun SettingsScreen(
                             label = { Text(label) },
                             icon = {
                                 SegmentedButtonDefaults.Icon(active = state.themeMode == mode) {
-                                    Icon(icon, contentDescription = null, modifier = Modifier.size(SegmentedButtonDefaults.IconSize))
+                                    Icon(icon, contentDescription = iconDesc, modifier = Modifier.size(SegmentedButtonDefaults.IconSize))
                                 }
                             }
                         )
@@ -101,7 +98,7 @@ fun SettingsScreen(
             }
 
             // ── Sprache ──────────────────────────────────────────────────────
-            SettingsSection(title = stringResource(R.string.language), icon = Icons.Default.Language) {
+            SettingsSection(title = stringResource(R.string.language), icon = Icons.Default.Language, iconContentDescription = stringResource(R.string.cd_language)) {
                 ExposedDropdownMenuBox(
                     expanded = languageExpanded,
                     onExpandedChange = { languageExpanded = it }
@@ -127,11 +124,11 @@ fun SettingsScreen(
                                     viewModel.setLanguage(lang)
                                     languageExpanded = false
                                 },
-                                trailingIcon = {
-                                    if (state.language == lang) {
-                                        Icon(Icons.Default.Check, contentDescription = null)
-                                    }
+                            trailingIcon = {
+                                if (state.language == lang) {
+                                    Icon(Icons.Default.Check, contentDescription = stringResource(R.string.cd_selected))
                                 }
+                            }
                             )
                         }
                     }
@@ -139,7 +136,7 @@ fun SettingsScreen(
             }
 
             // ── Lesezeichen ──────────────────────────────────────────────────
-            SettingsSection(title = stringResource(R.string.bookmarks_section), icon = Icons.Default.Bookmark) {
+            SettingsSection(title = stringResource(R.string.bookmarks_section), icon = Icons.Default.Bookmark, iconContentDescription = stringResource(R.string.cd_bookmarks)) {
                 OutlinedButton(
                     onClick = { setShowClearDialog(true) },
                     modifier = Modifier.fillMaxWidth(),
@@ -149,7 +146,7 @@ fun SettingsScreen(
                 ) {
                     Icon(
                         Icons.Default.DeleteForever,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.cd_delete_forever),
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -161,11 +158,12 @@ fun SettingsScreen(
             SettingsSection(
                 title = stringResource(R.string.about_app),
                 icon = Icons.Default.Info,
+                iconContentDescription = stringResource(R.string.cd_about),
                 trailingAction = {
                     IconButton(onClick = { showAbout = !showAbout }) {
                         Icon(
                             if (showAbout) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                            contentDescription = null
+                            contentDescription = if (showAbout) stringResource(R.string.cd_collapse) else stringResource(R.string.cd_expand)
                         )
                     }
                 }
@@ -202,6 +200,7 @@ private fun getLanguageDisplayName(language: AppLanguage): String {
 private fun SettingsSection(
     title: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
+    iconContentDescription: String? = null,
     trailingAction: @Composable (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -216,7 +215,7 @@ private fun SettingsSection(
             ) {
                 Icon(
                     icon,
-                    contentDescription = null,
+                    contentDescription = iconContentDescription,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
                 )

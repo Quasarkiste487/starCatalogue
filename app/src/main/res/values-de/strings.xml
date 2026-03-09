@@ -60,6 +60,7 @@
     <string name="theme_dark">Dunkel</string>
     <string name="language">Sprache</string>
     <string name="select_language">Sprache auswählen</string>
+    <string name="language_system">System</string>
     <string name="bookmarks_section">Lesezeichen</string>
     <string name="reset_bookmarks">Lesezeichen zurücksetzen</string>
     <string name="reset_bookmarks_dialog_title">Lesezeichen zurücksetzen</string>
@@ -83,5 +84,18 @@
     <string name="lang_french">Français</string>
     <string name="lang_spanish">Español</string>
     <string name="lang_italian">Italiano</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_delete_forever">Endgültig löschen</string>
+    <string name="cd_appearance">Erscheinungsbild</string>
+    <string name="cd_light_mode">Heller Modus</string>
+    <string name="cd_system_mode">Systemmodus</string>
+    <string name="cd_dark_mode">Dunkler Modus</string>
+    <string name="cd_language">Sprache</string>
+    <string name="cd_bookmarks">Lesezeichen</string>
+    <string name="cd_about">Über die App</string>
+    <string name="cd_expand">Erweitern</string>
+    <string name="cd_collapse">Reduzieren</string>
+    <string name="cd_selected">Ausgewählt</string>
 </resources>
 

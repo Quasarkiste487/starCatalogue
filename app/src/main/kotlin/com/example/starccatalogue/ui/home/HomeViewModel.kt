@@ -9,15 +9,15 @@ import kotlinx.coroutines.flow.asStateFlow
 
 // Datenklasse für ein Event – mit String Resource IDs
 data class EventRow(
-    @StringRes val titleRes: Int,
-    @StringRes val subtitleRes: Int,
-    @StringRes val timeRes: Int
+    @param:StringRes val titleRes: Int,
+    @param:StringRes val subtitleRes: Int,
+    @param:StringRes val timeRes: Int
 )
 
 // Datenklasse für den Blog-Artikel - mit String Resource IDs
 data class BlogArticle(
     val date: String,
-    @StringRes val titleRes: Int,
+    @param:StringRes val titleRes: Int,
     val paragraphRes: List<Int>
 )
 
@@ -25,7 +25,7 @@ data class BlogArticle(
 data class TopStar(
     val id: Int,
     val name: String,
-    @StringRes val descriptionRes: Int
+    @param:StringRes val descriptionRes: Int
 )
 
 // UI-State für den HomeScreen

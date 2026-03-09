@@ -60,7 +60,7 @@
     <string name="theme_dark">Dark</string>
     <string name="language">Language</string>
     <string name="select_language">Select Language</string>
-    <string name="language_system" translatable="false">System</string>
+    <string name="language_system">System</string>
     <string name="bookmarks_section">Bookmarks</string>
     <string name="reset_bookmarks">Reset Bookmarks</string>
     <string name="reset_bookmarks_dialog_title">Reset Bookmarks</string>
@@ -84,4 +84,17 @@
     <string name="lang_french">Français</string>
     <string name="lang_spanish">Español</string>
     <string name="lang_italian">Italiano</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_delete_forever">Delete permanently</string>
+    <string name="cd_appearance">Appearance</string>
+    <string name="cd_light_mode">Light mode</string>
+    <string name="cd_system_mode">System mode</string>
+    <string name="cd_dark_mode">Dark mode</string>
+    <string name="cd_language">Language</string>
+    <string name="cd_bookmarks">Bookmarks</string>
+    <string name="cd_about">About the app</string>
+    <string name="cd_expand">Expand</string>
+    <string name="cd_collapse">Collapse</string>
+    <string name="cd_selected">Selected</string>
 </resources>

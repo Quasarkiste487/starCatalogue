@@ -76,13 +76,14 @@ class SettingsManager(
     }
 
     private suspend fun persist(data: SettingsData) = withContext(Dispatchers.IO) {
+        val json: String
         synchronized(lock) {
-            val json = adapter.toJson(data)
+            json = adapter.toJson(data)
             file.writeText(json)
             current = data
         }
         _settingsFlow.value = data
-        logger.i("SettingsManager", "Saved: ${adapter.toJson(data)}")
+        logger.i("SettingsManager", "Saved: $json")
     }
 
     override suspend fun setThemeMode(mode: ThemeMode) {
