@@ -1,0 +1,101 @@
+<resources>
+    <string name="app_name">Star Catalogue</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_directory">Verzeichnis</string>
+    <string name="nav_bookmarks">Lesezeichen</string>
+    <string name="nav_settings">Einstellungen</string>
+
+    <!-- Home Screen -->
+    <string name="unknown_star">Unbekannter Stern</string>
+    <string name="top_star_today">Heutiger Top Stern</string>
+    <string name="no_description">Keine Beschreibung vorhanden.</string>
+    <string name="to_profile">zum Profil</string>
+    <string name="upcoming_sky_events">Nächste Himmelevents</string>
+
+    <!-- Home Screen - Blog -->
+    <string name="blog_title">Aktuelle Beobachtungen</string>
+    <string name="blog_paragraph_1">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
+    <string name="blog_paragraph_2">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+
+    <!-- Home Screen - Events -->
+    <string name="event_1_title">Sonnenfinsternis</string>
+    <string name="event_1_subtitle">Ein spektakuläres astronomisches Ereignis, sichtbar von mehreren Kontinenten.</string>
+    <string name="event_1_time">Taggesamtzeit - 10:00</string>
+    <string name="event_2_title">Mars und Saturn stehen im Zwiespalt</string>
+    <string name="event_2_subtitle">Die beiden Planeten erscheinen in entgegengesetzten Positionen am Nachthimmel.</string>
+    <string name="event_2_time">Stundenhalbzeit - 10:30</string>
+    <string name="event_3_title">Pluto wird wieder Planet</string>
+    <string name="event_3_subtitle">Astronomen überdenken die Klassifizierung von Pluto.</string>
+    <string name="event_3_time">Normalzeit - 13:37</string>
+
+    <!-- Home Screen - Top Star -->
+    <string name="top_star_description">Der hellste Stern am Nachthimmel</string>
+
+    <!-- List Screen -->
+    <string name="search_stars">Sterne suchen…</string>
+    <string name="search">Suche</string>
+
+    <!-- Bookmark Screen -->
+    <string name="bookmarks_title">Lesezeichen</string>
+
+    <!-- Stars Detail Screen -->
+    <string name="back">Zurück</string>
+    <string name="remove_bookmark">Bookmark entfernen</string>
+    <string name="add_bookmark">Bookmark hinzufügen</string>
+    <string name="magnitude_label">Magnitude %1$s</string>
+    <string name="base_data">Basisdaten</string>
+    <string name="identifier">Identifier</string>
+    <string name="declination">Deklination</string>
+    <string name="right_ascension">Rektaszension</string>
+    <string name="magnitude">Magnitude</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="appearance">Erscheinungsbild</string>
+    <string name="color_scheme">Farbschema</string>
+    <string name="theme_light">Hell</string>
+    <string name="theme_system">System</string>
+    <string name="theme_dark">Dunkel</string>
+    <string name="language">Sprache</string>
+    <string name="select_language">Sprache auswählen</string>
+    <string name="language_system">System</string>
+    <string name="bookmarks_section">Lesezeichen</string>
+    <string name="reset_bookmarks">Lesezeichen zurücksetzen</string>
+    <string name="reset_bookmarks_dialog_title">Lesezeichen zurücksetzen</string>
+    <string name="reset_bookmarks_dialog_message">Alle Lesezeichen werden unwiderruflich gelöscht. Fortfahren?</string>
+    <string name="delete">Löschen</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="about_app">Über die App</string>
+    <string name="about_app_name">App</string>
+    <string name="about_app_name_value">Star Catalogue</string>
+    <string name="about_version">Version</string>
+    <string name="about_description">Beschreibung</string>
+    <string name="about_description_value">Durchsuche und erkunde Sterne aus dem SIMBAD-Katalog. Speichere Favoriten als Lesezeichen und passe die App nach deinen Wünschen an.</string>
+    <string name="about_developed_at">Entwickelt an</string>
+    <string name="about_developed_at_value">HTWK Leipzig</string>
+    <string name="about_semester">Semester</string>
+    <string name="about_semester_value">5. Semester – Mobile Computing</string>
+
+    <!-- Languages -->
+    <string name="lang_german">Deutsch</string>
+    <string name="lang_english">English</string>
+    <string name="lang_french">Français</string>
+    <string name="lang_spanish">Español</string>
+    <string name="lang_italian">Italiano</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_delete_forever">Endgültig löschen</string>
+    <string name="cd_appearance">Erscheinungsbild</string>
+    <string name="cd_light_mode">Heller Modus</string>
+    <string name="cd_system_mode">Systemmodus</string>
+    <string name="cd_dark_mode">Dunkler Modus</string>
+    <string name="cd_language">Sprache</string>
+    <string name="cd_bookmarks">Lesezeichen</string>
+    <string name="cd_about">Über die App</string>
+    <string name="cd_expand">Erweitern</string>
+    <string name="cd_collapse">Reduzieren</string>
+    <string name="cd_selected">Ausgewählt</string>
+</resources>
+

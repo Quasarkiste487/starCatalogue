@@ -6,11 +6,14 @@ import com.example.starccatalogue.network.StarDataSource
 import com.example.starccatalogue.ui.bookmark.BookmarkViewModel
 import com.example.starccatalogue.ui.home.HomeViewModel
 import com.example.starccatalogue.ui.list.ListVM
+import com.example.starccatalogue.ui.settings.SettingsViewModel
 import com.example.starccatalogue.ui.stars.StarsViewModel
 import com.example.starccatalogue.util.AndroidLogger
 import com.example.starccatalogue.util.BookmarkManager
 import com.example.starccatalogue.util.Bookmarks
 import com.example.starccatalogue.util.Logger
+import com.example.starccatalogue.util.Settings
+import com.example.starccatalogue.util.SettingsManager
 import com.squareup.moshi.Moshi
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -22,11 +25,13 @@ val AppModule = module {
     viewModelOf(::ListVM)
     viewModelOf(::StarsViewModel)
     viewModelOf(::BookmarkViewModel)
+    viewModelOf(::SettingsViewModel)
 
     single { Moshi.Builder().build() }
 
     singleOf(::AndroidLogger) bind Logger::class
     singleOf(::SimbadSQLSource) bind StarDataSource::class
     singleOf(::BookmarkManager) bind Bookmarks::class
+    singleOf(::SettingsManager) bind Settings::class
     single { Simbad(get()) }
 }

@@ -1,0 +1,101 @@
+<resources>
+    <string name="app_name">Star Catalogue</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_directory">Directorio</string>
+    <string name="nav_bookmarks">Marcadores</string>
+    <string name="nav_settings">Ajustes</string>
+
+    <!-- Home Screen -->
+    <string name="unknown_star">Estrella desconocida</string>
+    <string name="top_star_today">Estrella del día</string>
+    <string name="no_description">Sin descripción disponible.</string>
+    <string name="to_profile">Ver perfil</string>
+    <string name="upcoming_sky_events">Próximos eventos celestes</string>
+
+    <!-- Home Screen - Blog -->
+    <string name="blog_title">Observaciones actuales</string>
+    <string name="blog_paragraph_1">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
+    <string name="blog_paragraph_2">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+
+    <!-- Home Screen - Events -->
+    <string name="event_1_title">Eclipse solar</string>
+    <string name="event_1_subtitle">Un espectacular evento astronómico visible desde varios continentes.</string>
+    <string name="event_1_time">Todo el día - 10:00</string>
+    <string name="event_2_title">Marte y Saturno en oposición</string>
+    <string name="event_2_subtitle">Los dos planetas aparecen en posiciones opuestas en el cielo nocturno.</string>
+    <string name="event_2_time">Media hora - 10:30</string>
+    <string name="event_3_title">Plutón vuelve a ser planeta</string>
+    <string name="event_3_subtitle">Los astrónomos reconsideran la clasificación de Plutón.</string>
+    <string name="event_3_time">Hora normal - 13:37</string>
+
+    <!-- Home Screen - Top Star -->
+    <string name="top_star_description">La estrella más brillante del cielo nocturno</string>
+
+    <!-- List Screen -->
+    <string name="search_stars">Buscar estrellas…</string>
+    <string name="search">Buscar</string>
+
+    <!-- Bookmark Screen -->
+    <string name="bookmarks_title">Marcadores</string>
+
+    <!-- Stars Detail Screen -->
+    <string name="back">Atrás</string>
+    <string name="remove_bookmark">Eliminar marcador</string>
+    <string name="add_bookmark">Añadir marcador</string>
+    <string name="magnitude_label">Magnitud %1$s</string>
+    <string name="base_data">Datos básicos</string>
+    <string name="identifier">Identificador</string>
+    <string name="declination">Declinación</string>
+    <string name="right_ascension">Ascensión recta</string>
+    <string name="magnitude">Magnitud</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Ajustes</string>
+    <string name="appearance">Apariencia</string>
+    <string name="color_scheme">Esquema de colores</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_system">Sistema</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="language">Idioma</string>
+    <string name="select_language">Seleccionar idioma</string>
+    <string name="language_system">Sistema</string>
+    <string name="bookmarks_section">Marcadores</string>
+    <string name="reset_bookmarks">Restablecer marcadores</string>
+    <string name="reset_bookmarks_dialog_title">Restablecer marcadores</string>
+    <string name="reset_bookmarks_dialog_message">Todos los marcadores se eliminarán permanentemente. ¿Continuar?</string>
+    <string name="delete">Eliminar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="about_app">Acerca de la app</string>
+    <string name="about_app_name">App</string>
+    <string name="about_app_name_value">Star Catalogue</string>
+    <string name="about_version">Versión</string>
+    <string name="about_description">Descripción</string>
+    <string name="about_description_value">Explora estrellas del catálogo SIMBAD. Guarda favoritos como marcadores y personaliza la app a tu gusto.</string>
+    <string name="about_developed_at">Desarrollado en</string>
+    <string name="about_developed_at_value">HTWK Leipzig</string>
+    <string name="about_semester">Semestre</string>
+    <string name="about_semester_value">5º semestre – Mobile Computing</string>
+
+    <!-- Languages -->
+    <string name="lang_german">Deutsch</string>
+    <string name="lang_english">English</string>
+    <string name="lang_french">Français</string>
+    <string name="lang_spanish">Español</string>
+    <string name="lang_italian">Italiano</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_delete_forever">Eliminar permanentemente</string>
+    <string name="cd_appearance">Apariencia</string>
+    <string name="cd_light_mode">Modo claro</string>
+    <string name="cd_system_mode">Modo del sistema</string>
+    <string name="cd_dark_mode">Modo oscuro</string>
+    <string name="cd_language">Idioma</string>
+    <string name="cd_bookmarks">Marcadores</string>
+    <string name="cd_about">Acerca de la app</string>
+    <string name="cd_expand">Expandir</string>
+    <string name="cd_collapse">Contraer</string>
+    <string name="cd_selected">Seleccionado</string>
+</resources>
+
