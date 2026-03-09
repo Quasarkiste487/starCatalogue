@@ -70,7 +70,6 @@
     <string name="about_app_name">Application</string>
     <string name="about_app_name_value">Star Catalogue</string>
     <string name="about_version">Version</string>
-    <string name="about_version_value">1.0.0</string>
     <string name="about_description">Description</string>
     <string name="about_description_value">Parcourez et explorez les étoiles du catalogue SIMBAD. Enregistrez vos favoris et personnalisez l\'application selon vos préférences.</string>
     <string name="about_developed_at">Développé à</string>
