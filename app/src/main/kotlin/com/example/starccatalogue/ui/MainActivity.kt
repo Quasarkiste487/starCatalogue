@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
@@ -18,6 +19,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -35,15 +37,28 @@ import com.example.starccatalogue.ui.list.ListR
 import com.example.starccatalogue.ui.list.ListS
 import com.example.starccatalogue.ui.settings.SettingsRoute
 import com.example.starccatalogue.ui.settings.SettingsScreen
+import com.example.starccatalogue.ui.settings.SettingsViewModel
 import com.example.starccatalogue.ui.stars.StarsRoute
 import com.example.starccatalogue.ui.stars.StarsScreen
 import com.example.starccatalogue.ui.theme.StarcCatalogueTheme
+import com.example.starccatalogue.util.ThemeMode
+import org.koin.compose.viewmodel.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent { StarcCatalogueTheme { AppRoot() } }
+        setContent {
+            val settingsViewModel: SettingsViewModel = koinViewModel()
+            val settingsState by settingsViewModel.settingsState.collectAsState()
+            val systemDark = isSystemInDarkTheme()
+            val darkTheme = when (settingsState.themeMode) {
+                ThemeMode.LIGHT  -> false
+                ThemeMode.DARK   -> true
+                ThemeMode.SYSTEM -> systemDark
+            }
+            StarcCatalogueTheme(darkTheme = darkTheme) { AppRoot() }
+        }
     }
 }
 
