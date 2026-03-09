@@ -51,6 +51,10 @@ class SettingsManager(
     private val _settingsFlow = MutableStateFlow(current)
     override val settingsFlow: StateFlow<SettingsData> = _settingsFlow.asStateFlow()
 
+    init {
+        applyLanguage()
+    }
+
     private fun loadSettings(): SettingsData {
         return synchronized(lock) {
             if (file.exists()) {
