@@ -10,6 +10,7 @@ import com.example.starccatalogue.util.ThemeMode
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class SettingsViewModel(
     private val settings: Settings,
@@ -20,11 +21,15 @@ class SettingsViewModel(
         .stateIn(viewModelScope, SharingStarted.Eagerly, settings.settingsFlow.value)
 
     fun setThemeMode(mode: ThemeMode) {
-        settings.setThemeMode(mode)
+        viewModelScope.launch {
+            settings.setThemeMode(mode)
+        }
     }
 
     fun setLanguage(language: AppLanguage) {
-        settings.setLanguage(language)
+        viewModelScope.launch {
+            settings.setLanguage(language)
+        }
     }
 
     fun clearBookmarks() {

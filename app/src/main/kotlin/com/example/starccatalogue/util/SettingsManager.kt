@@ -6,9 +6,11 @@ import androidx.core.os.LocaleListCompat
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 import java.io.File
 
 enum class ThemeMode { LIGHT, DARK, SYSTEM }
@@ -29,8 +31,9 @@ data class SettingsData(
 
 interface Settings {
     val settingsFlow: StateFlow<SettingsData>
-    fun setThemeMode(mode: ThemeMode)
-    fun setLanguage(language: AppLanguage)
+    suspend fun initialize()
+    suspend fun setThemeMode(mode: ThemeMode)
+    suspend fun setLanguage(language: AppLanguage)
     fun applyLanguage()
 }
 
@@ -46,17 +49,19 @@ class SettingsManager(
     private val adapter = moshi.adapter<SettingsData>()
 
     private val lock = Any()
-    private var current = loadSettings()
+    private var current = SettingsData() // Default until loaded
 
     private val _settingsFlow = MutableStateFlow(current)
     override val settingsFlow: StateFlow<SettingsData> = _settingsFlow.asStateFlow()
 
-    init {
+    override suspend fun initialize() {
+        current = loadSettings()
+        _settingsFlow.value = current
         applyLanguage()
     }
 
-    private fun loadSettings(): SettingsData {
-        return synchronized(lock) {
+    private suspend fun loadSettings(): SettingsData = withContext(Dispatchers.IO) {
+        synchronized(lock) {
             if (file.exists()) {
                 try {
                     adapter.fromJson(file.readText()) ?: SettingsData()
@@ -70,21 +75,21 @@ class SettingsManager(
         }
     }
 
-    private fun persist(data: SettingsData) {
+    private suspend fun persist(data: SettingsData) = withContext(Dispatchers.IO) {
         synchronized(lock) {
             val json = adapter.toJson(data)
             file.writeText(json)
             current = data
-            _settingsFlow.value = data
-            logger.i("SettingsManager", "Saved: $json")
         }
+        _settingsFlow.value = data
+        logger.i("SettingsManager", "Saved: ${adapter.toJson(data)}")
     }
 
-    override fun setThemeMode(mode: ThemeMode) {
+    override suspend fun setThemeMode(mode: ThemeMode) {
         persist(current.copy(themeMode = mode))
     }
 
-    override fun setLanguage(language: AppLanguage) {
+    override suspend fun setLanguage(language: AppLanguage) {
         persist(current.copy(language = language))
         applyLanguage()
     }
