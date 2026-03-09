@@ -60,6 +60,7 @@
     <string name="theme_dark">Dark</string>
     <string name="language">Language</string>
     <string name="select_language">Select Language</string>
+    <string name="language_system" translatable="false">System</string>
     <string name="bookmarks_section">Bookmarks</string>
     <string name="reset_bookmarks">Reset Bookmarks</string>
     <string name="reset_bookmarks_dialog_title">Reset Bookmarks</string>
@@ -70,7 +71,6 @@
     <string name="about_app_name">App</string>
     <string name="about_app_name_value">Star Catalogue</string>
     <string name="about_version">Version</string>
-    <string name="about_version_value">1.0.0</string>
     <string name="about_description">Description</string>
     <string name="about_description_value">Browse and explore stars from the SIMBAD catalog. Save favorites as bookmarks and customize the app to your liking.</string>
     <string name="about_developed_at">Developed at</string>

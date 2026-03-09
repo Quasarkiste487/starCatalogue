@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.io.File
 
 enum class ThemeMode { LIGHT, DARK, SYSTEM }
-enum class AppLanguage(val displayName: String, val code: String) {
-    SYSTEM("System", ""),
-    GERMAN("Deutsch", "de"),
-    ENGLISH("English", "en"),
-    FRENCH("Français", "fr"),
-    SPANISH("Español", "es"),
-    ITALIAN("Italiano", "it")
+enum class AppLanguage(val code: String) {
+    SYSTEM(""),
+    GERMAN("de"),
+    ENGLISH("en"),
+    FRENCH("fr"),
+    SPANISH("es"),
+    ITALIAN("it")
 }
 
 @JsonClass(generateAdapter = true)
@@ -35,8 +35,8 @@ interface Settings {
 }
 
 class SettingsManager(
-    private val context: Context,
-    private val moshi: Moshi,
+    context: Context,
+    moshi: Moshi,
     private val logger: Logger
 ) : Settings {
 
@@ -57,7 +57,7 @@ class SettingsManager(
                 try {
                     adapter.fromJson(file.readText()) ?: SettingsData()
                 } catch (e: Exception) {
-                    logger.e("SettingsManager", "Failed to load settings: ${e.message}")
+                    logger.e("SettingsManager", "Failed to load settings: ${e.message}", e)
                     SettingsData()
                 }
             } else {

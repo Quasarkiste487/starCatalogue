@@ -9,9 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.starccatalogue.R
 import com.example.starccatalogue.util.AppLanguage
 import com.example.starccatalogue.util.ThemeMode
@@ -22,26 +24,34 @@ import org.koin.compose.viewmodel.koinViewModel
 fun SettingsScreen(
     viewModel: SettingsViewModel = koinViewModel()
 ) {
-    val state by viewModel.settingsState.collectAsState()
+    val state by viewModel.settingsState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val versionName = remember {
+        try {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.0"
+        } catch (_: Exception) {
+            "1.0"
+        }
+    }
 
-    var showClearDialog by remember { mutableStateOf(false) }
+    val (showClearDialog, setShowClearDialog) = remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
     var languageExpanded by remember { mutableStateOf(false) }
 
     if (showClearDialog) {
         AlertDialog(
-            onDismissRequest = { showClearDialog = false },
+            onDismissRequest = { setShowClearDialog(false) },
             icon = { Icon(Icons.Default.DeleteForever, contentDescription = null) },
             title = { Text(stringResource(R.string.reset_bookmarks_dialog_title)) },
             text = { Text(stringResource(R.string.reset_bookmarks_dialog_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.clearBookmarks()
-                    showClearDialog = false
+                    setShowClearDialog(false)
                 }) { Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
-                TextButton(onClick = { showClearDialog = false }) { Text(stringResource(R.string.cancel)) }
+                TextButton(onClick = { setShowClearDialog(false) }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -104,7 +114,7 @@ fun SettingsScreen(
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                     )
                     ExposedDropdownMenu(
                         expanded = languageExpanded,
@@ -131,7 +141,7 @@ fun SettingsScreen(
             // ── Lesezeichen ──────────────────────────────────────────────────
             SettingsSection(title = stringResource(R.string.bookmarks_section), icon = Icons.Default.Bookmark) {
                 OutlinedButton(
-                    onClick = { showClearDialog = true },
+                    onClick = { setShowClearDialog(true) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.error
@@ -163,7 +173,7 @@ fun SettingsScreen(
                 if (showAbout) {
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         AboutRow(label = stringResource(R.string.about_app_name), value = stringResource(R.string.about_app_name_value))
-                        AboutRow(label = stringResource(R.string.about_version), value = stringResource(R.string.about_version_value))
+                        AboutRow(label = stringResource(R.string.about_version), value = versionName)
                         AboutRow(label = stringResource(R.string.about_description), value = stringResource(R.string.about_description_value))
                         AboutRow(label = stringResource(R.string.about_developed_at), value = stringResource(R.string.about_developed_at_value))
                         AboutRow(label = stringResource(R.string.about_semester), value = stringResource(R.string.about_semester_value))
@@ -179,7 +189,7 @@ fun SettingsScreen(
 @Composable
 private fun getLanguageDisplayName(language: AppLanguage): String {
     return when (language) {
-        AppLanguage.SYSTEM -> stringResource(R.string.theme_system)
+        AppLanguage.SYSTEM -> stringResource(R.string.language_system)
         AppLanguage.GERMAN -> stringResource(R.string.lang_german)
         AppLanguage.ENGLISH -> stringResource(R.string.lang_english)
         AppLanguage.FRENCH -> stringResource(R.string.lang_french)
