@@ -57,7 +57,7 @@
     <string name="magnitude">Magnitude</string>
     <string name="magnitude_value">Mag: %1$.2f</string>
     <string name="distance">Distance</string>
-    <string name="scientific_name">Nom scientifique</string>
+    <string name="spectral_type">Type spectral</string>
     <string name="unknown">Inconnu</string>
 
     <!-- Settings Screen -->

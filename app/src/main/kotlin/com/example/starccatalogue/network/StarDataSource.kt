@@ -16,7 +16,7 @@ data class StarDetails(
     val type: String,
     val distance: Float?,
     val distanceUnit: String?,
-    val scientificName: String?,
+    val spectralType: String?,
 )
 
 /**
