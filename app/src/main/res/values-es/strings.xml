@@ -56,6 +56,9 @@
     <string name="right_ascension">Ascensión recta</string>
     <string name="magnitude">Magnitud</string>
     <string name="magnitude_value">Mag: %1$.2f</string>
+    <string name="distance">Distancia</string>
+    <string name="spectral_type">Tipo espectral</string>
+    <string name="unknown">Desconocido</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Ajustes</string>

@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.MyLocation
+import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -223,6 +224,22 @@ private fun DataCardsSection(
             label = stringResource(R.string.magnitude),
             value = starState.magnitude.toString(),
             icon = Icons.Outlined.Explore
+        )
+
+        DataCard(
+            label = stringResource(R.string.distance),
+            value = if (starState.distance != null && !starState.distance.isNaN() && starState.distanceUnit != null) {
+                "${starState.distance} ${starState.distanceUnit}"
+            } else {
+                stringResource(R.string.unknown)
+            },
+            icon = Icons.Outlined.Explore
+        )
+
+        DataCard(
+            label = stringResource(R.string.spectral_type),
+            value = starState.spectralType ?: stringResource(R.string.unknown),
+            icon = Icons.Outlined.Science
         )
     }
 }

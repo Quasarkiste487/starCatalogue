@@ -14,6 +14,9 @@ data class StarDetails(
     val mag: Float,
     val shortType: String,
     val type: String,
+    val distance: Float?,
+    val distanceUnit: String?,
+    val spectralType: String?,
 )
 
 /**
@@ -271,10 +274,11 @@ class SimbadSQLSource(val simbad: Simbad) : StarDataSource {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun getStarDetails(oid: Int): StarDetails? {
         val query = """
-        SELECT oid, id, ra, dec, v, label, description from basic
+        SELECT oid, id, ra, dec, v, label, description, dist, unit, sp_type from basic
         JOIN ident on oid = oidref
         LEFT JOIN allfluxes using(oidref)
         LEFT JOIN otypedef using(otype)
+        LEFT JOIN mesDistance using(oidref)
         where oid = $oid and id like 'NAME%'
         """.trimIndent()
 
@@ -293,9 +297,12 @@ class SimbadSQLSource(val simbad: Simbad) : StarDataSource {
                 row[4].toString().toFloat(),
                 row[5].toString(),
                 row[6].toString(),
+                row[7]?.toString()?.toFloatOrNull(),
+                row[8]?.toString()?.trim(),
+                row[9]?.toString()?.trim()
             )
-        } catch (_: Exception) {
-            println("Invalid table row: $row")
+        } catch (e: Exception) {
+            println("Invalid table row: $row => Exception: $e")
             return null
         }
     }

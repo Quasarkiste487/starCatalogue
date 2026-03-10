@@ -21,6 +21,9 @@ data class StarUiState(
     val ra: Float = 0.0f,
     val dec: Float = 0.0f,
     val type: String = "",
+    val distance: Float? = null,
+    val distanceUnit: String? = null,
+    val spectralType: String? = null,
     val isLoading: Boolean = true,
     val isBookmarked: Boolean = false
 )
@@ -52,6 +55,9 @@ class StarsViewModel(
                         isLoading = false,
                         name = star.name,
                         type = star.type,
+                        distance = star.distance,
+                        distanceUnit = star.distanceUnit,
+                        spectralType = star.spectralType,
                         isBookmarked = bookmarks.isBookmark(star.oid)
                     )
                 } else {
