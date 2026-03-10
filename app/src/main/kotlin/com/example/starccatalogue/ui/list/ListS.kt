@@ -58,12 +58,15 @@ fun ListS(
 ) {
     val stars by viewModel.stars.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
     ListS(
         stars = stars,
         searchQuery = searchQuery,
+        sortOrder = sortOrder,
         onStarClick = onStarClick,
         onSearchQueryChange = viewModel::updateSearchQuery,
         onSearch = viewModel::search,
+        onSortOrderChange = viewModel::setSortOrder,
     )
 
 }
@@ -73,9 +76,11 @@ fun ListS(
 private fun ListS(
     stars: List<StarOverview>,
     searchQuery: String,
+    sortOrder: SortOrder,
     onStarClick: (Int) -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onSearch: () -> Unit,
+    onSortOrderChange: (SortOrder) -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -106,19 +111,19 @@ private fun ListS(
                         ) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.sort_a_z)) },
-                                onClick = { filterExpanded = false },
+                                onClick = { onSortOrderChange(SortOrder.NAME_ASC); filterExpanded = false },
                             )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.sort_z_a)) },
-                                onClick = { filterExpanded = false },
+                                onClick = { onSortOrderChange(SortOrder.NAME_DESC); filterExpanded = false },
                             )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.sort_magnitude_desc)) },
-                                onClick = { filterExpanded = false },
+                                onClick = { onSortOrderChange(SortOrder.MAGNITUDE_DESC); filterExpanded = false },
                             )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.sort_magnitude_asc)) },
-                                onClick = { filterExpanded = false },
+                                onClick = { onSortOrderChange(SortOrder.MAGNITUDE_ASC); filterExpanded = false },
                             )
                         }
                     }
@@ -194,6 +199,14 @@ private fun ListS(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.alpha(0.8f)
                                 )
+                                star.magnitude?.let { mag ->
+                                    Text(
+                                        text = stringResource(R.string.magnitude_value, mag),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.alpha(0.6f)
+                                    )
+                                }
                             }
                         }
                         Icon(
@@ -218,14 +231,16 @@ private fun ListScreenPreview() {
     StarcCatalogueTheme {
         ListS(
             stars = listOf(
-                StarOverview(1, "Sirius", "Main Sequence"),
-                StarOverview(2, "Canopus", "Supergiant"),
-                StarOverview(3, "Arcturus", "Giant"),
+                StarOverview(1, "Sirius", "Main Sequence", -1.46f),
+                StarOverview(2, "Canopus", "Supergiant", -0.74f),
+                StarOverview(3, "Arcturus", "Giant", -0.05f),
             ),
             searchQuery = "Sirius",
+            sortOrder = SortOrder.NAME_ASC,
             onStarClick = {},
             onSearchQueryChange = {},
             onSearch = {},
+            onSortOrderChange = {},
         )
     }
 }

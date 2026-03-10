@@ -55,6 +55,7 @@
     <string name="declination">Declinazione</string>
     <string name="right_ascension">Ascensione retta</string>
     <string name="magnitude">Magnitudine</string>
+    <string name="magnitude_value">Mag: %1$.2f</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Impostazioni</string>

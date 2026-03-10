@@ -5,7 +5,7 @@ import androidx.annotation.RequiresApi
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class StarOverview(val oid: Int, val name: String, val typ: String)
+data class StarOverview(val oid: Int, val name: String, val typ: String, val magnitude: Float? = null)
 data class StarDetails(
     val oid: Int,
     val name: String,
@@ -207,7 +207,8 @@ private class ADQLQueryBuilder(val fetchFunction: (String) -> List<StarOverview>
             SELECT ${if (this.limit != null) "TOP $limit" else ""} 
                 basic.oid,
                 ident.id,
-                otypedef.description
+                otypedef.description,
+                allfluxes.V
             FROM ident
             JOIN basic on basic.oid = ident.oidref""".trimIndent()
         )
@@ -215,9 +216,10 @@ private class ADQLQueryBuilder(val fetchFunction: (String) -> List<StarOverview>
         filterMap["ident"]?.forEach { builder.appendLine("AND ${it.build("ident")}") }
         builder.appendLine("LEFT JOIN otypedef ON otypedef.otype = basic.otype")
         filterMap["otypedef"]?.forEach { builder.appendLine("AND ${it.build("otypedef")}") }
+        builder.appendLine("LEFT JOIN allfluxes ON allfluxes.oidref = ident.oidref")
 
         filterMap.forEach { it ->
-            if (it.key in arrayOf("basic", "ident", "otypedef")) {
+            if (it.key in arrayOf("basic", "ident", "otypedef", "allfluxes")) {
                 return@forEach
             }
             val table = it.key
@@ -225,7 +227,7 @@ private class ADQLQueryBuilder(val fetchFunction: (String) -> List<StarOverview>
             it.value.forEach { builder.appendLine("AND ${it.build(table)}") }
         }
         ordering?.let {
-            if (filterMap[it.table] == null) {
+            if (filterMap[it.table] == null && it.table !in arrayOf("allfluxes")) {
                 builder.appendLine("LEFT JOIN ${it.table} ON ${it.table}.oidref = ident.oidref")
             }
             builder.appendLine(it.build())
@@ -251,6 +253,7 @@ class SimbadSQLSource(val simbad: Simbad) : StarDataSource {
                             row[0].toString().toInt(),
                             row[1].toString().substring(5),
                             row[2].toString(),
+                            row[3].toString().toFloatOrNull(),
                         )
                     )
                 }

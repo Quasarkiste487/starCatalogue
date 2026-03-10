@@ -20,6 +20,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
+enum class SortOrder {
+    NAME_ASC, NAME_DESC, MAGNITUDE_ASC, MAGNITUDE_DESC
+}
+
 @OptIn(FlowPreview::class)
 class ListVM(
     savedStateHandle: SavedStateHandle, private val starSource: StarDataSource
@@ -31,7 +35,18 @@ class ListVM(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), starNameFlow.value)
 
     private val _stars: MutableStateFlow<List<StarOverview>> = MutableStateFlow(emptyList())
-    val stars: StateFlow<List<StarOverview>> = _stars.asStateFlow()
+
+    private val _sortOrder = MutableStateFlow(SortOrder.NAME_ASC)
+    val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
+
+    val stars: StateFlow<List<StarOverview>> = combine(_stars, _sortOrder) { starList, order ->
+        when (order) {
+            SortOrder.NAME_ASC -> starList.sortedBy { it.name.lowercase() }
+            SortOrder.NAME_DESC -> starList.sortedByDescending { it.name.lowercase() }
+            SortOrder.MAGNITUDE_ASC -> starList.sortedBy { it.magnitude ?: Float.MAX_VALUE }
+            SortOrder.MAGNITUDE_DESC -> starList.sortedByDescending { it.magnitude ?: Float.MIN_VALUE }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
         viewModelScope.launch {
@@ -48,6 +63,10 @@ class ListVM(
     fun search(query: String? = null) {
         val q = query ?: _searchQuery.value
         loadData(q)
+    }
+
+    fun setSortOrder(order: SortOrder) {
+        _sortOrder.value = order
     }
 
     private fun loadData(query: String) {
