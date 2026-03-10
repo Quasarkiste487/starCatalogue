@@ -47,7 +47,6 @@ class StarsViewModel(
             val star = starSource.getStarDetails(starId)
             _starState.update {
                 if (star != null) {
-                    println(star)
                     StarUiState(
                         id = star.oid,
                         magnitude = star.mag,
