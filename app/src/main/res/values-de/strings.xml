@@ -56,6 +56,9 @@
     <string name="right_ascension">Rektaszension</string>
     <string name="magnitude">Magnitude</string>
     <string name="magnitude_value">Mag: %1$.2f</string>
+    <string name="distance">Entfernung</string>
+    <string name="scientific_name">Wissenschaftlicher Name</string>
+    <string name="unknown">Unbekannt</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Einstellungen</string>

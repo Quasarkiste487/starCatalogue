@@ -226,18 +226,18 @@ private fun DataCardsSection(
         )
 
         DataCard(
-            label = "Distance",
+            label = stringResource(R.string.distance),
             value = if (starState.distance != null && !starState.distance.isNaN() && starState.distanceUnit != null) {
                 "${starState.distance} ${starState.distanceUnit}"
             } else {
-                "Unknown"
+                stringResource(R.string.unknown)
             },
             icon = Icons.Outlined.Explore
         )
 
         DataCard(
-            label = "Scientific Name",
-            value = starState.scientificName?: "Unknown",
+            label = stringResource(R.string.scientific_name),
+            value = starState.scientificName ?: stringResource(R.string.unknown),
             icon = Icons.Outlined.Explore
         )
     }

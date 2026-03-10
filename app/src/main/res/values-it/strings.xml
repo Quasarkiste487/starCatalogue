@@ -56,6 +56,9 @@
     <string name="right_ascension">Ascensione retta</string>
     <string name="magnitude">Magnitudine</string>
     <string name="magnitude_value">Mag: %1$.2f</string>
+    <string name="distance">Distanza</string>
+    <string name="scientific_name">Nome scientifico</string>
+    <string name="unknown">Sconosciuto</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Impostazioni</string>
