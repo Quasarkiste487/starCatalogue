@@ -2,8 +2,10 @@ package com.example.starccatalogue.ui.list
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,10 +17,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +34,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -75,23 +83,62 @@ private fun ListS(
             Surface(
                 color = MaterialTheme.colorScheme.surface,
             ) {
-                SearchBar(
-                    query = searchQuery,
-                    onQueryChange = onSearchQueryChange,
-                    onSearch = { onSearch() },
-                    active = false,
-                    onActiveChange = {},
-                    placeholder = { Text(stringResource(R.string.search_stars)) },
-                    trailingIcon = {
-                        IconButton(onClick = onSearch) {
-                            Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.search))
-                        }
-                    },
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp)
-                ) { }
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        var filterExpanded by remember { mutableStateOf(false) }
+                        IconButton(onClick = { filterExpanded = true }) {
+                            Icon(
+                                Icons.Filled.FilterList,
+                                contentDescription = stringResource(R.string.filter)
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = filterExpanded,
+                            onDismissRequest = { filterExpanded = false },
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.sort_a_z)) },
+                                onClick = { filterExpanded = false },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.sort_z_a)) },
+                                onClick = { filterExpanded = false },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.sort_magnitude_desc)) },
+                                onClick = { filterExpanded = false },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.sort_magnitude_asc)) },
+                                onClick = { filterExpanded = false },
+                            )
+                        }
+                    }
+                    SearchBar(
+                        query = searchQuery,
+                        onQueryChange = onSearchQueryChange,
+                        onSearch = { onSearch() },
+                        active = false,
+                        onActiveChange = {},
+                        placeholder = { Text(stringResource(R.string.search_stars)) },
+                        trailingIcon = {
+                            IconButton(onClick = onSearch) {
+                                Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.search))
+                            }
+                        },
+                        windowInsets = WindowInsets(0.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                    ) { }
+                }
             }
         },
     ) { innerPadding ->

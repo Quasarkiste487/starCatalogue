@@ -36,6 +36,11 @@
     <!-- List Screen -->
     <string name="search_stars">Rechercher des étoiles…</string>
     <string name="search">Rechercher</string>
+    <string name="filter">Filtrer</string>
+    <string name="sort_a_z">A–Z</string>
+    <string name="sort_z_a">Z–A</string>
+    <string name="sort_magnitude_desc">Magnitude (décroissante)</string>
+    <string name="sort_magnitude_asc">Magnitude (croissante)</string>
 
     <!-- Bookmark Screen -->
     <string name="bookmarks_title">Favoris</string>
