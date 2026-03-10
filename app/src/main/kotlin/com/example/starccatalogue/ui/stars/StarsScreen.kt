@@ -208,13 +208,13 @@ private fun DataCardsSection(
         ) {
                 DataCard(
                     label = stringResource(R.string.declination),
-                    value = starState.dec.toString(),
+                    value = if(starState.dec.isNaN()) stringResource(R.string.unknown) else starState.dec.toString(),
                     icon = Icons.Filled.Star,
                     modifier = Modifier.weight(1f)
                 )
                 DataCard(
                     label = stringResource(R.string.right_ascension),
-                    value = starState.ra.toString(),
+                    value = if (starState.ra.isNaN()) stringResource(R.string.unknown) else starState.ra.toString(),
                     icon = Icons.Outlined.MyLocation,
                     modifier = Modifier.weight(1f)
                 )
@@ -222,7 +222,7 @@ private fun DataCardsSection(
 
         DataCard(
             label = stringResource(R.string.magnitude),
-            value = starState.magnitude.toString(),
+            value = if(starState.magnitude.isNaN()) stringResource(R.string.unknown) else starState.magnitude.toString(),
             icon = Icons.Outlined.Explore
         )
 
