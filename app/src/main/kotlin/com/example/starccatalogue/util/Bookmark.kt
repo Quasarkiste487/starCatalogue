@@ -24,7 +24,7 @@ class BookmarkManager(private val context: Context, private val moshi: Moshi, va
     private val adapter = moshi.adapter<MutableList<StarOverview>>()
     private val lock = Any()
     private val bookmarks = loadBookmarks()
-    private val _bookmarksFlow = MutableStateFlow<List<StarOverview>>(bookmarks)
+    private val _bookmarksFlow = MutableStateFlow<List<StarOverview>>(bookmarks.toList())
     override val bookmarksFlow: StateFlow<List<StarOverview>> = _bookmarksFlow.asStateFlow()
 
 
