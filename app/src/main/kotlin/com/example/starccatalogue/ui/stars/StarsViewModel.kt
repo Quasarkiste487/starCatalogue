@@ -21,6 +21,9 @@ data class StarUiState(
     val ra: Float = 0.0f,
     val dec: Float = 0.0f,
     val type: String = "",
+    val distance: Float? = null,
+    val distanceUnit: String? = null,
+    val scientificName: String? = null,
     val isLoading: Boolean = true,
     val isBookmarked: Boolean = false
 )
@@ -44,6 +47,7 @@ class StarsViewModel(
             val star = starSource.getStarDetails(starId)
             _starState.update {
                 if (star != null) {
+                    println(star)
                     StarUiState(
                         id = star.oid,
                         magnitude = star.mag,
@@ -52,6 +56,9 @@ class StarsViewModel(
                         isLoading = false,
                         name = star.name,
                         type = star.type,
+                        distance = star.distance,
+                        distanceUnit = star.distanceUnit,
+                        scientificName = star.scientificName,
                         isBookmarked = bookmarks.isBookmark(star.oid)
                     )
                 } else {

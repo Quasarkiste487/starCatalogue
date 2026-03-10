@@ -224,6 +224,22 @@ private fun DataCardsSection(
             value = starState.magnitude.toString(),
             icon = Icons.Outlined.Explore
         )
+
+        DataCard(
+            label = "Distance",
+            value = if (starState.distance != null && !starState.distance.isNaN() && starState.distanceUnit != null) {
+                "${starState.distance} ${starState.distanceUnit}"
+            } else {
+                "Unknown"
+            },
+            icon = Icons.Outlined.Explore
+        )
+
+        DataCard(
+            label = "Scientific Name",
+            value = starState.scientificName?: "Unknown",
+            icon = Icons.Outlined.Explore
+        )
     }
 }
 
